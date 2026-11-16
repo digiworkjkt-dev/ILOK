@@ -1,0 +1,188 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import AdSlot from "../components/AdSlot.astro";
+import DirectoryView from "../components/DirectoryView.astro";
+import rawLomba from "../data/lomba.json";
+import { type OrganizerItem, fmtDate } from "../utils/format";
+import { SITE } from "../config/site";
+import { HUBS } from "../data/hubs";
+import { GUIDES } from "../data/guides";
+
+const allItems = rawLomba as OrganizerItem[];
+const pageItems = allItems.slice(0, SITE.perPage);
+const totalPages = Math.ceil(allItems.length / SITE.perPage);
+
+const openCnt = allItems.filter((x) => x.status === "Pendaftaran Dibuka").length;
+const liveCnt = allItems.filter((x) => x.status === "Sedang Berlangsung").length;
+const schedCnt = allItems.filter((x) => x.status === "Akan Datang (Terjadwal)").length;
+const star45Cnt = allItems.filter((x) => x.rating >= 4).length;
+const totalComps = allItems.reduce((s, x) => s + x.compsCnt, 0);
+const totalBranches = allItems.reduce((s, x) => s + x.branchesCnt, 0);
+
+// Top 5 urgent deadlines >= 2026-11-15
+const urgentDeadlines = allItems
+  .filter((x) => x.regSort !== "9999-12-31" && x.regSort >= "2026-11-15" && ["Pendaftaran Dibuka", "Sedang Berlangsung", "Akan Datang (Terjadwal)"].includes(x.status))
+  .sort((a, b) => a.regSort.localeCompare(b.regSort) || b.rating - a.rating)
+  .slice(0, 5);
+
+// Top 5 ongoing / starting soon
+const imminentEvents = allItems
+  .filter((x) => ["Sedang Berlangsung", "Pendaftaran Dibuka", "Akan Datang (Terjadwal)"].includes(x.status) && x.effectiveSort !== "9999-12-31")
+  .slice(0, 5);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  description: SITE.description,
+  url: new URL("/", Astro.site || "https://lombakurasi.id").toString(),
+};
+---
+
+<BaseLayout
+  title={`${SITE.name} — Kalender Lomba Terkurasi Bintang 3–5 Terdekat`}
+  description={SITE.description}
+  canonicalPath="/"
+  jsonLd={jsonLd}
+>
+  <section class="hero">
+    <h1>Kalender Lomba Terkurasi Bintang 3★ ke Atas</h1>
+    <p>
+      Rekapitulasi jadwal pendaftaran dan pelaksanaan lomba terdekat dari penyelenggara terkurasi peringkat bintang 3, 4, dan 5 untuk jenjang SD, SMP, SMA/SMK, hingga perguruan tinggi.
+    </p>
+    <div class="hero-badges">
+      <span class="hero-badge">Acuan: {SITE.referenceDateLabel}</span>
+      <span class="hero-badge">{allItems.length} Penyelenggara Terverifikasi</span>
+      <span class="hero-badge">{totalComps} Ajang · {totalBranches.toLocaleString("id-ID")} Cabang</span>
+      <span class="hero-badge">{openCnt + liveCnt + schedCnt} Jadwal Aktif &amp; Terkonfirmasi</span>
+    </div>
+  </section>
+
+  <section class="kpi-grid" aria-label="Ringkasan Cepat">
+    <a class="kpi-card" href="/kategori/pendaftaran-dibuka/">
+      <div class="kpi-label">Pendaftaran Dibuka</div>
+      <div class="kpi-val">{openCnt}</div>
+      <div class="kpi-sub">Lihat semua →</div>
+    </a>
+    <a class="kpi-card" href="/kategori/jadwal-akhir-2026/">
+      <div class="kpi-label">Aktif &amp; Akhir 2026</div>
+      <div class="kpi-val">{liveCnt + schedCnt}</div>
+      <div class="kpi-sub">Jadwal pasti →</div>
+    </a>
+    <a class="kpi-card" href="/kategori/bintang-4-dan-5/">
+      <div class="kpi-label">Kurasi 4★ &amp; 5★</div>
+      <div class="kpi-val">{star45Cnt}</div>
+      <div class="kpi-sub">Peringkat tertinggi →</div>
+    </a>
+    <a class="kpi-card" href="/kategori/jadwal-2027/">
+      <div class="kpi-label">Agenda 2027</div>
+      <div class="kpi-val">{allItems.filter((x) => x.effectiveSort.startsWith("2027")).length}</div>
+      <div class="kpi-sub">Terjadwal &amp; siklus →</div>
+    </a>
+    <a class="kpi-card" href="/panduan/">
+      <div class="kpi-label">Panduan Peserta</div>
+      <div class="kpi-val">{GUIDES.length}</div>
+      <div class="kpi-sub">Artikel strategi →</div>
+    </a>
+  </section>
+
+  <section class="digest-grid" aria-label="Sorotan Jadwal dan Deadline Terdekat">
+    <div class="digest-box">
+      <div class="digest-head">
+        <h2>Batas Pendaftaran Terdekat</h2>
+        <a href="/kategori/pendaftaran-dibuka/">Semua dibuka →</a>
+      </div>
+      {
+        urgentDeadlines.map((d) => (
+          <div class="digest-row">
+            <span class="digest-date urgent">Tutup {fmtDate(d.regDeadline)}</span>
+            <div>
+              <a href={`/penyelenggara/${d.slug}/`} style="font-weight:600;color:var(--text);">
+                {d.event !== "-" ? d.event : d.org}
+              </a>
+              <div style="font-size:12px;color:var(--text-soft);">
+                {d.org} · {d.jenjang}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="digest-box">
+      <div class="digest-head">
+        <h2>Pelaksanaan Terdekat &amp; Berlangsung</h2>
+        <a href="/kategori/jadwal-akhir-2026/">Kalender 2026 →</a>
+      </div>
+      {
+        imminentEvents.map((e) => (
+          <div class="digest-row">
+            <span class="digest-date">{e.effectiveSort === "2026-11-15" ? "Berlangsung" : fmtDate(e.start)}</span>
+            <div>
+              <a href={`/penyelenggara/${e.slug}/`} style="font-weight:600;color:var(--text);">
+                {e.event !== "-" ? e.event : e.org}
+              </a>
+              <div style="font-size:12px;color:var(--text-soft);">
+                {e.status} · {e.modeType}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <AdSlot type="leaderboard" slotId={SITE.ads.slots.topLeaderboard} />
+
+  <div class="layout-2col">
+    <div>
+      <DirectoryView
+        allItems={allItems}
+        pageItems={pageItems}
+        currentPage={1}
+        totalPages={totalPages}
+        basePath="/"
+      />
+    </div>
+
+    <aside class="sidebar-sticky">
+      <AdSlot type="sidebar-box" slotId={SITE.ads.slots.sidebarBox} />
+
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Direktori Kategori
+        </h3>
+        <ul class="sidebar-list">
+          {
+            HUBS.map((h) => {
+              const cnt = allItems.filter(h.filterFn).length;
+              return (
+                <li>
+                  <a href={`/kategori/${h.slug}/`}>{h.shortTitle}</a>
+                  <span class="sidebar-count">{cnt}</span>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Panduan &amp; Strategi
+        </h3>
+        <ul class="sidebar-list">
+          {
+            GUIDES.slice(0, 5).map((g) => (
+              <li style="display:block;">
+                <a href={`/panduan/${g.slug}/`} style="font-weight:500;">{g.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <AdSlot type="sidebar-sticky" slotId={SITE.ads.slots.sidebarSticky} />
+    </aside>
+  </div>
+</BaseLayout>

@@ -1,0 +1,153 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { GUIDES, type GuideArticle } from "../../data/guides";
+import { SITE } from "../../config/site";
+
+export function getStaticPaths() {
+  return GUIDES.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props as { guide: GuideArticle };
+const canonicalPath = `/panduan/${guide.slug}/`;
+const siteBase = Astro.site || "https://lombakurasi.id";
+
+const jsonLd: Record<string, any>[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Beranda", item: new URL("/", siteBase).toString() },
+      { "@type": "ListItem", position: 2, name: "Panduan", item: new URL("/panduan/", siteBase).toString() },
+      { "@type": "ListItem", position: 3, name: guide.title, item: new URL(canonicalPath, siteBase).toString() },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: guide.title,
+    description: guide.excerpt,
+    datePublished: guide.publishedAt,
+    dateModified: guide.updatedAt,
+    author: { "@type": "Organization", name: SITE.name },
+    publisher: { "@type": "Organization", name: SITE.name },
+  },
+];
+
+if (guide.faqs.length > 0) {
+  jsonLd.push({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: guide.faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  });
+}
+
+const otherGuides = GUIDES.filter((g) => g.slug !== guide.slug).slice(0, 5);
+---
+
+<BaseLayout
+  title={`${guide.title} — ${SITE.name}`}
+  description={guide.excerpt}
+  canonicalPath={canonicalPath}
+  jsonLd={jsonLd}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> / <a href="/panduan/">Panduan</a> / <span>{guide.category}</span>
+  </nav>
+
+  <AdSlot type="leaderboard" slotId={SITE.ads.slots.topLeaderboard} />
+
+  <div class="layout-2col">
+    <article class="panel">
+      <div class="lomba-head-meta">
+        <span class="badge b-level">{guide.category}</span>
+        <span class="mono" style="font-size:11.5px;color:var(--text-soft);">
+          {guide.readMinutes} menit baca · Diperbarui {guide.updatedAt}
+        </span>
+      </div>
+
+      <h1 style="margin:0 0 12px;font-size:clamp(21px,2.5vw,27px);line-height:1.25;color:var(--text);">
+        {guide.title}
+      </h1>
+      <p style="font-size:14.5px;color:var(--text-muted);background:var(--surface-2);border-left:3px solid var(--primary);padding:10px 14px;margin:0 0 18px;">
+        {guide.excerpt}
+      </p>
+
+      {
+        guide.sections.map((sec, idx) => (
+          <>
+            <section style="margin-bottom:18px;">
+              <h2 style="font-size:18px;margin-bottom:8px;">{sec.heading}</h2>
+              {sec.paragraphs.map((p) => (
+                <p style="margin:0 0 10px;color:var(--text);">{p}</p>
+              ))}
+              {sec.bullets && (
+                <ul style="margin:8px 0 10px;padding-left:20px;color:var(--text);">
+                  {sec.bullets.map((b) => (
+                    <li style="margin-bottom:6px;">{b}</li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            {idx === 0 && <AdSlot type="inarticle" slotId={SITE.ads.slots.inArticle} />}
+          </>
+        ))
+      }
+
+      {
+        guide.faqs.length > 0 && (
+          <section style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+            <h2 style="font-size:17px;margin-bottom:10px;">Pertanyaan yang Sering Diajukan (FAQ)</h2>
+            {guide.faqs.map((f) => (
+              <div style="margin-bottom:10px;background:var(--surface-2);padding:12px 14px;border-radius:var(--radius);border:1px solid var(--border);">
+                <div style="font-weight:700;color:var(--text);margin-bottom:4px;">{f.q}</div>
+                <div style="color:var(--text-muted);font-size:13.5px;">{f.a}</div>
+              </div>
+            ))}
+          </section>
+        )
+      }
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+        <div class="mono" style="font-size:11px;text-transform:uppercase;font-weight:600;color:var(--text-soft);margin-bottom:8px;">
+          Daftar Lomba Terkait
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          {
+            guide.relatedHubs.map((rh) => (
+              <a class="btn btn-primary btn-sm" href={rh.href}>{rh.label} →</a>
+            ))
+          }
+        </div>
+      </div>
+    </article>
+
+    <aside class="sidebar-sticky">
+      <AdSlot type="sidebar-box" slotId={SITE.ads.slots.sidebarBox} />
+
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Panduan Lainnya
+        </h3>
+        <ul class="sidebar-list">
+          {
+            otherGuides.map((og) => (
+              <li style="display:block;">
+                <a href={`/panduan/${og.slug}/`}>{og.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <AdSlot type="sidebar-sticky" slotId={SITE.ads.slots.sidebarSticky} />
+    </aside>
+  </div>
+</BaseLayout>

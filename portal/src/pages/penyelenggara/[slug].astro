@@ -1,0 +1,328 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import LombaCard from "../../components/LombaCard.astro";
+import rawLomba from "../../data/lomba.json";
+import {
+  type OrganizerItem,
+  fmtDate,
+  countdownLabel,
+  statusClass,
+  modeClass,
+  starsText,
+} from "../../utils/format";
+import { SITE } from "../../config/site";
+import { GUIDES } from "../../data/guides";
+
+export function getStaticPaths() {
+  const allItems = rawLomba as OrganizerItem[];
+  return allItems.map((item) => {
+    const related = allItems
+      .filter((x) => x.slug !== item.slug)
+      .map((x) => {
+        let score = 0;
+        if (x.clusters.some((c) => item.clusters.includes(c))) score += 3;
+        if (x.levels.some((l) => item.levels.includes(l))) score += 2;
+        if (["Pendaftaran Dibuka", "Sedang Berlangsung", "Akan Datang (Terjadwal)"].includes(x.status)) score += 3;
+        if (x.rating >= 4) score += 1;
+        return { item: x, score };
+      })
+      .sort((a, b) => b.score - a.score || a.item.effectiveSort.localeCompare(b.item.effectiveSort))
+      .slice(0, 4)
+      .map((z) => z.item);
+
+    return {
+      params: { slug: item.slug },
+      props: { item, related },
+    };
+  });
+}
+
+const { item, related } = Astro.props;
+const stars = starsText(item.rating);
+const cd = countdownLabel(item);
+const primaryCluster = item.clusters[0] || "Riset dan Inovasi";
+const clusterSlug =
+  primaryCluster === "Olahraga"
+    ? "olahraga"
+    : primaryCluster === "Seni Budaya"
+    ? "seni-budaya"
+    : "riset-dan-inovasi";
+
+const titleText =
+  item.event && item.event !== "-"
+    ? `${item.event} — ${item.org} | Kurasi ${item.rating}★`
+    : `${item.org} — Lomba Terkurasi ${item.rating}★`;
+
+const descText = `Jadwal terbaru ${item.event !== "-" ? item.event : item.org} oleh ${item.org} (Peringkat Kurasi Bintang ${item.rating}★). Status: ${item.status}, pelaksanaan: ${fmtDate(item.start, true)}, jenjang: ${item.jenjang}.`;
+
+const canonicalPath = `/penyelenggara/${item.slug}/`;
+const siteBase = Astro.site || "https://lombakurasi.id";
+
+const jsonLdList: Record<string, any>[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Beranda", item: new URL("/", siteBase).toString() },
+      { "@type": "ListItem", position: 2, name: primaryCluster, item: new URL(`/kategori/${clusterSlug}/`, siteBase).toString() },
+      { "@type": "ListItem", position: 3, name: item.org, item: new URL(canonicalPath, siteBase).toString() },
+    ],
+  },
+];
+
+if (
+  item.event !== "-" &&
+  /^\d{4}-\d{2}(-\d{2})?$/.test(item.start) &&
+  ["Pendaftaran Dibuka", "Sedang Berlangsung", "Akan Datang (Terjadwal)"].includes(item.status)
+) {
+  const startIso = item.start.length === 7 ? `${item.start}-01` : item.start;
+  const endIso =
+    /^\d{4}-\d{2}-\d{2}$/.test(item.end)
+      ? item.end
+      : /^\d{4}-\d{2}$/.test(item.end)
+      ? `${item.end}-28`
+      : startIso;
+
+  jsonLdList.push({
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: item.event,
+    startDate: startIso,
+    endDate: endIso,
+    eventAttendanceMode:
+      item.modeType === "Online / Daring"
+        ? "https://schema.org/OnlineEventAttendanceMode"
+        : item.modeType === "Hybrid"
+        ? "https://schema.org/MixedEventAttendanceMode"
+        : "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    organizer: {
+      "@type": "Organization",
+      name: item.org,
+      url: item.orgLink || item.sourceUrl,
+    },
+    location:
+      item.modeType === "Online / Daring"
+        ? { "@type": "VirtualLocation", url: item.sourceUrl || item.orgLink }
+        : { "@type": "Place", name: item.modeLokasi || item.country },
+    description: item.notes,
+  });
+}
+---
+
+<BaseLayout title={titleText} description={descText} canonicalPath={canonicalPath} jsonLd={jsonLdList}>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> /
+    <a href={`/kategori/${clusterSlug}/`}>{primaryCluster}</a> /
+    <span>{item.org}</span>
+  </nav>
+
+  <AdSlot type="leaderboard" slotId={SITE.ads.slots.topLeaderboard} />
+
+  <div class="layout-2col">
+    <div>
+      <article class="panel">
+        <div class="lomba-head-meta">
+          <span class={`badge ${statusClass(item.status)}`}>{item.status}</span>
+          <span class="stars" title={`Peringkat Kurasi Bintang ${item.rating}`}>
+            {stars.full}<span class="dim">{stars.empty}</span>
+          </span>
+          <span class="mono" style="font-size:12px;color:var(--text-muted);">
+            Bintang {item.rating} {item.avgScore !== null ? `· Skor ${item.avgScore}` : ""}
+          </span>
+          {cd && <span class={`cd-pill ${cd.tone}`} style="margin-top:0;">{cd.text}</span>}
+        </div>
+
+        <h1 style="margin:0 0 6px;font-size:clamp(20px,2.4vw,26px);color:var(--text);line-height:1.25;">
+          {item.event !== "-" ? item.event : item.org}
+        </h1>
+        <p style="margin:0 0 14px;font-size:14px;color:var(--text-muted);font-weight:600;">
+          Penyelenggara: {item.org}{item.orgShort ? ` (${item.orgShort})` : ""} · {item.country}
+        </p>
+
+        <div class="badge-row" style="margin-bottom:16px;">
+          {item.clusters.map((c) => <span class="badge b-cluster">{c}</span>)}
+          {item.levels.map((l) => <span class="badge b-level">{l}</span>)}
+          <span class={`badge ${modeClass(item.modeType)}`}>{item.modeType}</span>
+        </div>
+
+        <div class="spec-grid">
+          <div class="spec-cell">
+            <div class="side-k">Pelaksanaan Terdekat</div>
+            <div class="side-v mono" style="font-size:13px;">
+              {item.start === "-" ? "Belum Diumumkan" : `${item.isExactStart ? "" : "Est. "}${fmtDate(item.start, true)}`}
+              {item.end !== "-" && item.end !== item.start ? ` – ${fmtDate(item.end, true)}` : ""}
+            </div>
+          </div>
+          <div class="spec-cell">
+            <div class="side-k">Batas Pendaftaran</div>
+            <div class="side-v mono" style={`font-size:13px;color:${item.regDeadline !== "-" ? "var(--red-fg)" : "var(--text-muted)"};`}>
+              {item.regDeadline !== "-" ? fmtDate(item.regDeadline, true) : "Lihat situs penyelenggara"}
+            </div>
+          </div>
+          <div class="spec-cell">
+            <div class="side-k">Jenjang Sasaran</div>
+            <div class="side-v" style="font-size:13px;">{item.jenjang}</div>
+          </div>
+          <div class="spec-cell">
+            <div class="side-k">Mode &amp; Lokasi</div>
+            <div class="side-v" style="font-size:13px;">{item.modeLokasi}</div>
+          </div>
+          <div class="spec-cell">
+            <div class="side-k">Cakupan Terkurasi</div>
+            <div class="side-v mono" style="font-size:13px;">{item.compsCnt} Ajang · {item.branchesCnt} Cabang</div>
+          </div>
+          <div class="spec-cell">
+            <div class="side-k">Bidang / Sektor</div>
+            <div class="side-v" style="font-size:13px;">{item.sectors.length ? item.sectors.join(", ") : item.clusters.join(", ")}</div>
+          </div>
+        </div>
+
+        {
+          item.status === "Estimasi Siklus Tahunan" && (
+            <div style="background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--amber-fg);">
+              <strong>Catatan Proyeksi Siklus:</strong> Tanggal pelaksanaan di atas merupakan estimasi berdasarkan pola tahunan dan edisi terakhir tahun 2026. Pantau tautan resmi penyelenggara untuk pengumuman tanggal pasti edisi mendatang.
+            </div>
+          )
+        }
+
+        <h2 style="font-size:16px;margin-bottom:6px;">Ringkasan Jadwal &amp; Informasi Penyelenggaraan</h2>
+        <p style="margin:0 0 16px;color:var(--text-muted);">{item.notes}</p>
+
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          {
+            item.sourceUrl && (
+              <a class="btn btn-primary" href={item.sourceUrl} target="_blank" rel="noopener nofollow">
+                Sumber Jadwal Resmi ↗
+              </a>
+            )
+          }
+          {
+            item.orgLink && item.orgLink !== item.sourceUrl && (
+              <a class="btn" href={item.orgLink} target="_blank" rel="noopener nofollow">
+                Website Penyelenggara ↗
+              </a>
+            )
+          }
+          <button
+            type="button"
+            class="btn btn-save"
+            data-save-slug={item.slug}
+            onclick={`toggleSaveLomba('${item.slug}')`}
+          >
+            Simpan
+          </button>
+        </div>
+      </article>
+
+      <AdSlot type="inarticle" slotId={SITE.ads.slots.inArticle} />
+
+      <section class="panel">
+        <h2 style="font-size:17px;margin-bottom:6px;">
+          Daftar Ajang &amp; Cabang Terkurasi ({item.compsCnt} Ajang · {item.branchesCnt} Cabang)
+        </h2>
+        <p style="margin:0 0 12px;font-size:13px;color:var(--text-muted);">
+          Seluruh riwayat ajang dan cabang lomba di bawah ini memenuhi standar kurasi minimal Bintang 3★ untuk penyelenggara <strong>{item.org}</strong>.
+        </p>
+
+        <div class="simt-table-wrap">
+          <table class="simt-table">
+            <thead>
+              <tr>
+                <th>Nama Ajang</th>
+                <th>Peringkat &amp; Skor</th>
+                <th>Tingkat &amp; Klaster</th>
+                <th>Riwayat Pelaksanaan</th>
+                <th>Cabang Terkurasi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                item.simtComps.map((c) => {
+                  const cs = starsText(c.rating);
+                  return (
+                    <tr>
+                      <td>
+                        <strong>{c.name}</strong> {c.short ? `(${c.short})` : ""}
+                        {c.link && (
+                          <div style="margin-top:3px;">
+                            <a href={c.link} target="_blank" rel="noopener nofollow" class="mono" style="font-size:11.5px;">
+                              Tautan Ajang ↗
+                            </a>
+                          </div>
+                        )}
+                      </td>
+                      <td style="white-space:nowrap;">
+                        <span class="stars">
+                          {cs.full}
+                          <span class="dim">{cs.empty}</span>
+                        </span>
+                        {c.score !== null && <div class="mono" style="font-size:11.5px;color:var(--text-muted);">Skor {c.score}</div>}
+                      </td>
+                      <td>
+                        <div><strong>{c.level}</strong></div>
+                        <div style="font-size:12px;color:var(--text-muted);">{c.cluster} · {c.category}</div>
+                      </td>
+                      <td class="mono" style="white-space:nowrap;font-size:12px;">
+                        {fmtDate(c.start)}
+                        {c.end && c.end !== c.start ? ` – ${fmtDate(c.end)}` : ""}
+                      </td>
+                      <td>
+                        <span class="mono" style="font-size:12px;font-weight:600;">{c.branches.length} cabang:</span>{" "}
+                        <span style="color:var(--text-muted);">{c.branches.join(", ")}</span>
+                      </td>
+                    </tr>
+                  );
+                })
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section style="margin-top:20px;">
+        <h2 style="font-size:16px;text-transform:uppercase;letter-spacing:0.03em;color:var(--text);margin-bottom:10px;">
+          Lomba Terkurasi Sejenis &amp; Terdekat Lainnya
+        </h2>
+        <div class="lomba-list">
+          {related.map((r) => <LombaCard item={r} />)}
+        </div>
+      </section>
+    </div>
+
+    <aside class="sidebar-sticky">
+      <AdSlot type="sidebar-box" slotId={SITE.ads.slots.sidebarBox} />
+
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Ringkasan Kurasi
+        </h3>
+        <ul class="sidebar-list">
+          <li><span>Rating Maksimal</span><strong class="mono">{item.rating}★</strong></li>
+          <li><span>Skor Rata-rata</span><strong class="mono">{item.avgScore ?? "-"}</strong></li>
+          <li><span>Total Ajang</span><strong class="mono">{item.compsCnt} judul</strong></li>
+          <li><span>Total Cabang</span><strong class="mono">{item.branchesCnt} cabang</strong></li>
+          <li><span>Edisi Terakhir</span><strong class="mono">{fmtDate(item.latestSimt)}</strong></li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Panduan Terkait
+        </h3>
+        <ul class="sidebar-list">
+          {
+            GUIDES.slice(0, 4).map((g) => (
+              <li style="display:block;">
+                <a href={`/panduan/${g.slug}/`}>{g.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <AdSlot type="sidebar-sticky" slotId={SITE.ads.slots.sidebarSticky} />
+    </aside>
+  </div>
+</BaseLayout>

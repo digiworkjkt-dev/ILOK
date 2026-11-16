@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+---
+
+<BaseLayout
+  title={`Tentang Kami & Metodologi Kurasi — ${SITE.name}`}
+  description="Mengenal metodologi kurasi lomba bintang 3 ke atas dan penelusuran jadwal kompetisi terdekat di InfoLombaKurasi."
+  canonicalPath="/tentang/"
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> › <span>Tentang Kami</span>
+  </nav>
+
+  <article class="panel">
+    <h1>Tentang {SITE.name}</h1>
+    <p>
+      <strong>{SITE.name}</strong> adalah direktori informasi independen yang membantu pelajar (SD, SMP, SMA/SMK/MA), mahasiswa, guru pembina, dan orang tua menemukan jadwal pelaksanaan lomba terdekat dari penyelenggara terkurasi berperingkat <strong>Bintang 3★ hingga 5★</strong>.
+    </p>
+    <h2>Metodologi Penyusunan Data</h2>
+    <ol>
+      <li>
+        <strong>Penyaringan Standar Kurasi (≥ 3★):</strong> Data kurasi diseleksi berdasarkan kelayakan penyelenggara, rekam jejak ajang, dan peringkat kualitas bintang 3, 4, dan 5 yang mencakup 292 penyelenggara unik, 682 judul ajang, dan 1.284 cabang kompetisi.
+      </li>
+      <li>
+        <strong>Penelusuran Jadwal Terdekat (*Deep Search*):</strong> Tim kami melakukan penelusuran langsung ke situs resmi masing-masing penyelenggara untuk memetakan agenda pelaksanaan terdekat berdasarkan acuan waktu <strong>{SITE.referenceDateLabel}</strong>.
+      </li>
+      <li>
+        <strong>Pemisahan Status Transparan:</strong> Setiap jadwal diberi label jelas antara <em>Pendaftaran Dibuka</em>, <em>Sedang Berlangsung</em>, <em>Akan Datang (Terjadwal)</em>, <em>Estimasi Siklus Tahunan</em>, atau <em>Belum Ada Info Terbaru</em> agar pengguna tidak keliru antara tanggal resmi dan proyeksi tahunan.
+      </li>
+    </ol>
+  </article>
+</BaseLayout>

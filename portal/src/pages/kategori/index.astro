@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import rawLomba from "../../data/lomba.json";
+import type { OrganizerItem } from "../../utils/format";
+import { HUBS } from "../../data/hubs";
+import { SITE } from "../../config/site";
+
+const allItems = rawLomba as OrganizerItem[];
+const groups = ["Status & Prioritas", "Klaster Bidang", "Jenjang Sasaran", "Tingkat", "Periode Waktu"] as const;
+---
+
+<BaseLayout
+  title={`Kategori Lomba Terkurasi — ${SITE.name}`}
+  description="Jelajahi daftar lomba terkurasi bintang 3 sampai 5 berdasarkan status pendaftaran, peringkat bintang, klaster bidang, jenjang pendidikan, dan periode waktu."
+  canonicalPath="/kategori/"
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> / <span>Kategori Lomba</span>
+  </nav>
+
+  <section class="hero" style="margin-top:8px;">
+    <h1>Direktori Kategori Lomba Terkurasi</h1>
+    <p>
+      Pilih kategori di bawah ini untuk menemukan kompetisi bintang 3★–5★ yang paling relevan dengan jenjang pendidikan, bidang minat, dan jadwal terdekat Anda.
+    </p>
+  </section>
+
+  <AdSlot type="leaderboard" slotId={SITE.ads.slots.topLeaderboard} />
+
+  {
+    groups.map((grp) => (
+      <section style="margin-bottom:22px;">
+        <h2 style="font-size:14px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text);margin-bottom:8px;">{grp}</h2>
+        <div class="kpi-grid">
+          {HUBS.filter((h) => h.group === grp).map((h) => {
+            const cnt = allItems.filter(h.filterFn).length;
+            return (
+              <a class="kpi-card" href={`/kategori/${h.slug}/`}>
+                <div class="kpi-label">{h.group}</div>
+                <div class="kpi-val" style="font-size:19px;">{h.shortTitle}</div>
+                <div class="kpi-sub">{cnt} penyelenggara →</div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    ))
+  }
+</BaseLayout>

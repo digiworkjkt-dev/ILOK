@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { GUIDES } from "../../data/guides";
+import { SITE } from "../../config/site";
+---
+
+<BaseLayout
+  title={`Panduan Kurasi & Strategi Lomba — ${SITE.name}`}
+  description="Kumpulan artikel panduan kurasi lomba bintang 1 sampai 5, strategi portofolio SNBP/PPDB jalur prestasi, serta tips persiapan olimpiade dan riset."
+  canonicalPath="/panduan/"
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> / <span>Panduan Kurasi</span>
+  </nav>
+
+  <section class="hero" style="margin-top:8px;">
+    <h1>Panduan Kurasi &amp; Strategi Lomba</h1>
+    <p>
+      Pelajari cara membaca peringkat bintang kurasi, memverifikasi keaslian penyelenggara lomba, dan menyusun agenda kompetisi terkurasi untuk jalur prestasi sekolah maupun perguruan tinggi.
+    </p>
+  </section>
+
+  <AdSlot type="leaderboard" slotId={SITE.ads.slots.topLeaderboard} />
+
+  <div class="layout-2col">
+    <div class="lomba-list">
+      {
+        GUIDES.map((g, idx) => (
+          <>
+            <article class="panel" style="margin-bottom:0;">
+              <div class="lomba-head-meta">
+                <span class="badge b-level">{g.category}</span>
+                <span class="mono" style="font-size:11.5px;color:var(--text-soft);">{g.readMinutes} menit baca · {g.updatedAt}</span>
+              </div>
+              <h2 style="font-size:18px;margin:0 0 6px;line-height:1.3;">
+                <a href={`/panduan/${g.slug}/`} style="color:var(--text);">{g.title}</a>
+              </h2>
+              <p style="margin:0 0 12px;color:var(--text-muted);font-size:13.5px;">{g.excerpt}</p>
+              <a class="btn btn-primary btn-sm" href={`/panduan/${g.slug}/`}>Baca Panduan →</a>
+            </article>
+            {(idx + 1) % 4 === 0 && idx + 1 < GUIDES.length && (
+              <AdSlot type="infeed" slotId={SITE.ads.slots.inFeed} />
+            )}
+          </>
+        ))
+      }
+    </div>
+
+    <aside class="sidebar-sticky">
+      <AdSlot type="sidebar-box" slotId={SITE.ads.slots.sidebarBox} />
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Akses Cepat Direktori
+        </h3>
+        <ul class="sidebar-list">
+          <li><a href="/kategori/pendaftaran-dibuka/">Pendaftaran Dibuka</a></li>
+          <li><a href="/kategori/bintang-4-dan-5/">Kurasi Bintang 4★ &amp; 5★</a></li>
+          <li><a href="/kategori/sma-smk-ma/">Jenjang SMA/SMK/MA</a></li>
+          <li><a href="/kategori/riset-dan-inovasi/">Riset &amp; Inovasi</a></li>
+        </ul>
+      </div>
+      <AdSlot type="sidebar-sticky" slotId={SITE.ads.slots.sidebarSticky} />
+    </aside>
+  </div>
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+---
+
+<BaseLayout
+  title={`Disclaimer — ${SITE.name}`}
+  description="Penafian status independen direktori lomba InfoLombaKurasi dan anjuran verifikasi langsung ke sumber resmi penyelenggara."
+  canonicalPath="/disclaimer/"
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> › <span>Disclaimer</span>
+  </nav>
+
+  <article class="panel">
+    <h1>Disclaimer (Penafian)</h1>
+    <p>
+      <strong>{SITE.name}</strong> adalah portal direktori dan kurasi informasi kompetisi <strong>independen</strong>. Situs ini tidak berafiliasi langsung dengan panitia penyelenggara lomba mana pun kecuali dinyatakan secara eksplisit.
+    </p>
+    <ul>
+      <li>
+        Jadwal pendaftaran, tanggal pelaksanaan, biaya, dan petunjuk teknis (juknis) dapat berubah sewaktu-waktu sesuai kebijakan masing-masing penyelenggara lomba.
+      </li>
+      <li>
+        Untuk informasi bertanda <em>Estimasi Siklus Tahunan</em>, tanggal merupakan perkiraan berdasarkan pola tahunan edisi sebelumnya dan belum tentu menjadi tanggal resmi penyelenggaraan berikutnya.
+      </li>
+      <li>
+        Peserta, orang tua, dan pihak sekolah dianjurkan melakukan verifikasi akhir langsung pada situs resmi penyelenggara sebelum melakukan pendaftaran atau transaksi apa pun.
+      </li>
+    </ul>
+  </article>
+</BaseLayout>

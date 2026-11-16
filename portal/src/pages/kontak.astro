@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+---
+
+<BaseLayout
+  title={`Kontak & Koreksi Jadwal — ${SITE.name}`}
+  description="Hubungi redaksi InfoLombaKurasi untuk pembaruan jadwal lomba terbaru, koreksi tautan resmi penyelenggara, atau masukan teknis."
+  canonicalPath="/kontak/"
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> › <span>Kontak</span>
+  </nav>
+
+  <article class="panel">
+    <h1>Kontak &amp; Pembaruan Jadwal Lomba</h1>
+    <p>
+      Apabila Anda merupakan penyelenggara lomba terkurasi, guru pembina, atau peserta yang menemukan pembaruan tanggal pendaftaran, perubahan tautan resmi, atau koreksi informasi, silakan kirimkan detailnya kepada kami.
+    </p>
+    <ul>
+      <li><strong>Email Redaksi:</strong> <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a></li>
+      <li><strong>Format Koreksi Cepat:</strong> Sertakan <em>Nama Penyelenggara</em>, <em>Nama Ajang Terbaru</em>, <em>Tanggal Pelaksanaan &amp; Batas Pendaftaran</em>, serta <em>Tautan Halaman Resmi</em>.</li>
+    </ul>
+  </article>
+</BaseLayout>

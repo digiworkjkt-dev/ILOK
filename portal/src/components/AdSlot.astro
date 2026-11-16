@@ -1,0 +1,50 @@
+---
+import { SITE } from "../config/site";
+
+export interface Props {
+  type: "leaderboard" | "infeed" | "inarticle" | "sidebar-box" | "sidebar-sticky" | "mobile-anchor";
+  slotId?: string;
+  label?: string;
+}
+
+const { type, slotId = "", label } = Astro.props;
+const client = SITE.ads.adsenseClient;
+const hasLiveAd = Boolean(client && slotId);
+
+const typeMap = {
+  leaderboard: { cls: "ad-leaderboard", text: "Slot Iklan Top Leaderboard (728×90 / Responsif)" },
+  infeed: { cls: "ad-infeed", text: "Slot Iklan In-Feed Native (Responsif)" },
+  inarticle: { cls: "ad-inarticle", text: "Slot Iklan In-Article (336×280 / Responsif)" },
+  "sidebar-box": { cls: "ad-sidebar-box", text: "Slot Iklan Sidebar (300×250)" },
+  "sidebar-sticky": { cls: "ad-sidebar-sticky", text: "Slot Iklan Sidebar Sticky (300×600)" },
+  "mobile-anchor": { cls: "ad-mobile-anchor", text: "Slot Iklan Mobile Sticky Anchor (320×50)" },
+};
+
+const meta = typeMap[type];
+const shouldRender = hasLiveAd || SITE.ads.showPlaceholders;
+---
+
+{
+  shouldRender && (
+    <aside class={`ad-slot ${meta.cls} ${hasLiveAd ? "ad-live" : ""}`} aria-label="Area Iklan">
+      <div class="ad-label">Iklan</div>
+      <div class="ad-body">
+        {hasLiveAd ? (
+          <>
+            <ins
+              class="adsbygoogle"
+              style="display:block;width:100%"
+              data-ad-client={client}
+              data-ad-slot={slotId}
+              data-ad-format={type === "infeed" ? "fluid" : "auto"}
+              data-full-width-responsive="true"
+            />
+            <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </>
+        ) : (
+          <span>{label || meta.text}</span>
+        )}
+      </div>
+    </aside>
+  )
+}

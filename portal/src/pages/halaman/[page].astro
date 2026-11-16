@@ -1,0 +1,80 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import DirectoryView from "../../components/DirectoryView.astro";
+import rawLomba from "../../data/lomba.json";
+import type { OrganizerItem } from "../../utils/format";
+import { SITE } from "../../config/site";
+import { HUBS } from "../../data/hubs";
+
+export function getStaticPaths() {
+  const allItems = rawLomba as OrganizerItem[];
+  const totalPages = Math.ceil(allItems.length / SITE.perPage);
+  const paths = [];
+  for (let p = 2; p <= totalPages; p++) {
+    const start = (p - 1) * SITE.perPage;
+    paths.push({
+      params: { page: String(p) },
+      props: {
+        allItems,
+        pageItems: allItems.slice(start, start + SITE.perPage),
+        currentPage: p,
+        totalPages,
+      },
+    });
+  }
+  return paths;
+}
+
+const { allItems, pageItems, currentPage, totalPages } = Astro.props;
+---
+
+<BaseLayout
+  title={`Daftar Lomba Terkurasi (Halaman ${currentPage}) — ${SITE.name}`}
+  description={`Halaman ${currentPage} dari direktori ${allItems.length} penyelenggara lomba terkurasi bintang 3 sampai 5 dengan jadwal terdekat 2026–2027.`}
+  canonicalPath={`/halaman/${currentPage}/`}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> / <span>Halaman {currentPage}</span>
+  </nav>
+
+  <section class="hero" style="margin-top:8px;">
+    <h1>Kalender Lomba Terkurasi — Halaman {currentPage} dari {totalPages}</h1>
+    <p>
+      Daftar penyelenggara lomba terkurasi bintang 3★–5★ diurutkan berdasarkan jadwal pelaksanaan terdekat per {SITE.referenceDateLabel}.
+    </p>
+  </section>
+
+  <AdSlot type="leaderboard" slotId={SITE.ads.slots.topLeaderboard} />
+
+  <div class="layout-2col">
+    <div>
+      <DirectoryView
+        allItems={allItems}
+        pageItems={pageItems}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        basePath="/"
+      />
+    </div>
+    <aside class="sidebar-sticky">
+      <AdSlot type="sidebar-box" slotId={SITE.ads.slots.sidebarBox} />
+      <div class="panel">
+        <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+          Direktori Kategori
+        </h3>
+        <ul class="sidebar-list">
+          {
+            HUBS.map((h) => (
+              <li>
+                <a href={`/kategori/${h.slug}/`}>{h.shortTitle}</a>
+                <span class="sidebar-count">{allItems.filter(h.filterFn).length}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <AdSlot type="sidebar-sticky" slotId={SITE.ads.slots.sidebarSticky} />
+    </aside>
+  </div>
+</BaseLayout>

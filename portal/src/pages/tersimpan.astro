@@ -1,0 +1,124 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import rawLomba from "../data/lomba.json";
+import type { OrganizerItem } from "../utils/format";
+import { SITE } from "../config/site";
+
+const allItems = (rawLomba as OrganizerItem[]).map((x) => ({
+  slug: x.slug,
+  org: x.org,
+  event: x.event,
+  status: x.status,
+  rating: x.rating,
+  start: x.start,
+  end: x.end,
+  regDeadline: x.regDeadline,
+  jenjang: x.jenjang,
+  modeType: x.modeType,
+  sourceUrl: x.sourceUrl,
+}));
+---
+
+<BaseLayout
+  title={`Lomba Tersimpan Saya — ${SITE.name}`}
+  description="Daftar lomba terkurasi pilihan Anda yang disimpan di browser."
+  canonicalPath="/tersimpan/"
+  noindex={true}
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> / <span>Lomba Tersimpan</span>
+  </nav>
+
+  <section class="hero" style="margin-top:8px;">
+    <h1>Lomba Tersimpan Saya</h1>
+    <p>
+      Simpan lomba-lomba incaran Anda agar mudah memantau batas pendaftaran dan tanggal pelaksanaan terdekat. Data disimpan secara lokal di browser Anda.
+    </p>
+  </section>
+
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+      <div id="savedMeta" class="mono" style="font-size:12.5px;color:var(--text-muted);">Memuat daftar tersimpan...</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn btn-sm btn-accent" id="btnExportSaved">Ekspor CSV</button>
+        <button type="button" class="btn btn-sm" id="btnClearSaved">Kosongkan Semua</button>
+      </div>
+    </div>
+
+    <div id="savedList" class="lomba-list"></div>
+  </div>
+
+  <script is:inline define:vars={{ allItems }}>
+    (function () {
+      const map = new Map(allItems.map((x) => [x.slug, x]));
+      function esc(v) {
+        return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+      function render() {
+        const slugs = window.getSavedLombaSlugs ? window.getSavedLombaSlugs() : [];
+        const items = slugs.map((s) => map.get(s)).filter(Boolean);
+        const meta = document.getElementById("savedMeta");
+        const list = document.getElementById("savedList");
+        if (items.length === 0) {
+          meta.innerHTML = "Belum ada lomba yang disimpan.";
+          list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-soft);">Klik tombol <strong>Simpan</strong> pada lomba di <a href="/">Kalender Lomba</a> atau halaman detail untuk menambahkannya ke sini.</div>`;
+          return;
+        }
+        meta.innerHTML = `Total <strong>${items.length}</strong> lomba tersimpan.`;
+        list.innerHTML = items
+          .map(
+            (x) => `
+          <article class="lomba-card">
+            <div>
+              <div class="lomba-head-meta">
+                <span class="badge b-level">${esc(x.status)}</span>
+                <span class="stars">${"★".repeat(x.rating)}</span>
+              </div>
+              <h3 class="lomba-title"><a href="/penyelenggara/${x.slug}/">${esc(x.event !== "-" ? x.event : x.org)}</a></h3>
+              <div class="lomba-org">${esc(x.org)} · ${esc(x.modeType)}</div>
+              <div class="lomba-actions">
+                <a class="btn btn-primary btn-sm" href="/penyelenggara/${x.slug}/">Buka Detail</a>
+                <button type="button" class="btn btn-sm btn-save saved" data-save-slug="${x.slug}" onclick="toggleSaveLomba('${x.slug}')">Tersimpan</button>
+              </div>
+            </div>
+            <div class="lomba-side">
+              <div class="side-kv">
+                <div class="side-k">Pelaksanaan</div>
+                <div class="side-v mono">${esc(x.start)}${x.end && x.end !== "-" && x.end !== x.start ? " – " + esc(x.end) : ""}</div>
+              </div>
+              <div class="side-kv">
+                <div class="side-k">Batas Daftar</div>
+                <div class="side-v mono" style="color:${x.regDeadline !== "-" ? "var(--red-fg)" : "var(--text-soft)"};">${esc(x.regDeadline)}</div>
+              </div>
+            </div>
+          </article>
+        `
+          )
+          .join("");
+      }
+
+      document.getElementById("btnClearSaved")?.addEventListener("click", () => {
+        localStorage.setItem("lombakurasi_saved_slugs", "[]");
+        if (window.syncSaveButtons) window.syncSaveButtons();
+        render();
+      });
+
+      document.getElementById("btnExportSaved")?.addEventListener("click", () => {
+        const slugs = window.getSavedLombaSlugs ? window.getSavedLombaSlugs() : [];
+        const items = slugs.map((s) => map.get(s)).filter(Boolean);
+        if (!items.length) return;
+        const headers = ["Penyelenggara", "Lomba Terdekat", "Status", "Rating", "Mulai", "Selesai", "Batas Daftar", "Jenjang", "Sumber"];
+        const csvEsc = (v) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+        const rows = items.map((x) => [x.org, x.event, x.status, x.rating, x.start, x.end, x.regDeadline, x.jenjang, x.sourceUrl].map(csvEsc).join(","));
+        const blob = new Blob(["\uFEFF" + headers.map(csvEsc).join(",") + "\n" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "lomba_tersimpan_saya.csv";
+        a.click();
+      });
+
+      window.addEventListener("lombakurasi:saved-changed", render);
+      document.addEventListener("DOMContentLoaded", render);
+    })();
+  </script>
+</BaseLayout>

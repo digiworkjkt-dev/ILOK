@@ -1,0 +1,628 @@
+---
+import type { OrganizerItem } from "../utils/format";
+import LombaCard from "./LombaCard.astro";
+import AdSlot from "./AdSlot.astro";
+import { SITE } from "../config/site";
+
+export interface Props {
+  allItems: OrganizerItem[];
+  pageItems: OrganizerItem[];
+  currentPage?: number;
+  totalPages?: number;
+  basePath?: string;
+  hideClusterFilter?: boolean;
+  hideLevelFilter?: boolean;
+  hideStatusFilter?: boolean;
+}
+
+const {
+  allItems,
+  pageItems,
+  currentPage = 1,
+  totalPages = 1,
+  basePath = "/",
+  hideClusterFilter = false,
+  hideLevelFilter = false,
+  hideStatusFilter = false,
+} = Astro.props;
+
+const startNo = (currentPage - 1) * SITE.perPage + 1;
+
+const compactData = allItems.map((x) => ({
+  id: x.id,
+  slug: x.slug,
+  org: x.org,
+  orgShort: x.orgShort,
+  orgLink: x.orgLink,
+  country: x.country,
+  rating: x.rating,
+  avgScore: x.avgScore,
+  branchesCnt: x.branchesCnt,
+  compsCnt: x.compsCnt,
+  topBranches: x.topBranches || [],
+  clusters: x.clusters,
+  levels: x.levels,
+  event: x.event,
+  status: x.status,
+  start: x.start,
+  end: x.end,
+  regDeadline: x.regDeadline,
+  effectiveSort: x.effectiveSort,
+  isExactStart: x.isExactStart,
+  regSort: x.regSort,
+  jenjang: x.jenjang,
+  jenjangTags: x.jenjangTags,
+  modeLokasi: x.modeLokasi,
+  modeType: x.modeType,
+  sourceUrl: x.sourceUrl,
+  notes: x.notes,
+  qText: [
+    x.org,
+    x.orgShort,
+    x.event,
+    x.notes,
+    x.jenjang,
+    x.modeLokasi,
+    ...x.clusters,
+    ...x.levels,
+    ...x.sectors,
+    ...x.simtComps.map((c) => `${c.name} ${c.short} ${c.branches.join(" ")}`),
+  ]
+    .join(" ")
+    .toLowerCase(),
+}));
+
+function pageHref(p: number): string {
+  if (p <= 1) return basePath;
+  return basePath === "/" ? `/halaman/${p}/` : `${basePath}halaman/${p}/`;
+}
+---
+
+<section class="filter-bar-panel" aria-label="Filter dan Pengurutan Lomba">
+  <div class="filter-top-row">
+    <div class="filter-search-wrap">
+      <svg class="filter-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input id="fSearch" type="text" aria-label="Cari lomba, penyelenggara, atau cabang" placeholder="Cari lomba, penyelenggara, atau cabang (mis. matematika, IYSA)..." />
+    </div>
+
+    <select id="fSort" class="filter-sort-select" aria-label="Urutkan data">
+      <option value="nearest_asc">Urut: Pelaksanaan Terdekat</option>
+      <option value="deadline_asc">Urut: Deadline Terdekat</option>
+      <option value="rating_desc">Urut: Bintang Tertinggi (5★–3★)</option>
+      <option value="score_desc">Urut: Skor Kurasi Tertinggi</option>
+      <option value="branches_desc">Urut: Cabang Terbanyak</option>
+      <option value="org_asc">Urut: Penyelenggara (A–Z)</option>
+    </select>
+
+    <button type="button" class="btn btn-sm" id="btnToggleAdvFilters" aria-expanded="false">
+      Filter <span class="filter-count-pill hidden" id="filterCountPill">0</span>
+    </button>
+    <button type="button" class="btn btn-sm hidden" id="btnResetFilters">Reset</button>
+    <button type="button" class="btn btn-sm btn-accent" id="btnExportCsv">CSV</button>
+  </div>
+
+  <div class="quick-chips" role="group" aria-label="Filter Cepat">
+    <button type="button" class="chip-btn active" data-chip="ALL">Semua</button>
+    {!hideStatusFilter && <button type="button" class="chip-btn" data-chip="OPEN">Pendaftaran Dibuka</button>}
+    <button type="button" class="chip-btn" data-chip="STAR45">Bintang 4–5</button>
+    <button type="button" class="chip-btn" data-chip="ONLINE">Online</button>
+    <button type="button" class="chip-btn" data-chip="SMA">SMA / SMK</button>
+    <button type="button" class="chip-btn" data-chip="SMP">SMP / MTs</button>
+    <button type="button" class="chip-btn" data-chip="MHS">Mahasiswa</button>
+  </div>
+
+  <div class="filter-drawer hidden" id="advFilterGrid">
+    {
+      !hideStatusFilter && (
+        <select id="fStatus" aria-label="Status Jadwal">
+          <option value="ALL">Status: Semua</option>
+          <option value="CONFIRMED_ACTIVE">Status: Pasti &amp; Aktif</option>
+          <option value="Pendaftaran Dibuka">Pendaftaran Dibuka</option>
+          <option value="Sedang Berlangsung">Sedang Berlangsung</option>
+          <option value="Akan Datang (Terjadwal)">Akan Datang (Terjadwal)</option>
+          <option value="Estimasi Siklus Tahunan">Estimasi Siklus Tahunan</option>
+          <option value="Belum Ada Info Terbaru">Belum Ada Info Terbaru</option>
+        </select>
+      )
+    }
+
+    <select id="fTimeWindow" aria-label="Rentang Waktu">
+      <option value="ALL">Waktu: Semua</option>
+      <option value="ACTIVE_NOV">Aktif / Nov 2026</option>
+      <option value="DEC_2026">Desember 2026</option>
+      <option value="LATE_2026">Akhir 2026 (Nov–Des)</option>
+      <option value="Q1_2027">Q1 2027 (Jan–Mar)</option>
+      <option value="Q2_2027">Q2 2027 (Apr–Jun)</option>
+      <option value="H2_2027">H2 2027 (Jul–Des)</option>
+      <option value="HAS_DEADLINE">Ada Batas Daftar</option>
+    </select>
+
+    <select id="fRating" aria-label="Peringkat Kurasi">
+      <option value="ALL">Bintang: 3★–5★</option>
+      <option value="5">Bintang 5★ Saja</option>
+      <option value="4PLUS">Bintang 4★ &amp; 5★</option>
+      <option value="4">Bintang 4★ Saja</option>
+      <option value="3">Bintang 3★ Saja</option>
+    </select>
+
+    {
+      !hideClusterFilter && (
+        <select id="fCluster" aria-label="Klaster Bidang">
+          <option value="ALL">Klaster: Semua</option>
+          <option value="Riset dan Inovasi">Riset dan Inovasi</option>
+          <option value="Olahraga">Olahraga</option>
+          <option value="Seni Budaya">Seni Budaya</option>
+        </select>
+      )
+    }
+
+    {
+      !hideLevelFilter && (
+        <select id="fLevel" aria-label="Tingkat">
+          <option value="ALL">Tingkat: Semua</option>
+          <option value="Internasional">Internasional</option>
+          <option value="Nasional">Nasional</option>
+          <option value="Provinsi">Provinsi</option>
+          <option value="Kabupaten/Kota">Kabupaten/Kota</option>
+        </select>
+      )
+    }
+
+    <select id="fJenjang" aria-label="Jenjang Sasaran">
+      <option value="ALL">Jenjang: Semua</option>
+      <option value="SD/MI">SD / MI</option>
+      <option value="SMP/MTs">SMP / MTs</option>
+      <option value="SMA/SMK/MA">SMA / SMK / MA</option>
+      <option value="Mahasiswa/DIKTI">Mahasiswa / DIKTI</option>
+      <option value="Guru/Tendik">Guru / Tendik</option>
+      <option value="Umum/Atlet">Umum / Atlet</option>
+      <option value="PAUD/TK">PAUD / TK</option>
+    </select>
+
+    <select id="fMode" aria-label="Mode Pelaksanaan">
+      <option value="ALL">Mode: Semua</option>
+      <option value="Online / Daring">Online / Daring</option>
+      <option value="Offline / Luring">Offline / Luring</option>
+      <option value="Hybrid">Hybrid</option>
+    </select>
+
+    <select id="fCountry" aria-label="Negara">
+      <option value="ALL">Negara: Semua</option>
+      <option value="ID">Indonesia</option>
+      <option value="INTL">Luar Negeri</option>
+    </select>
+  </div>
+</section>
+
+<div id="directoryMeta" class="mono" style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">
+  Menampilkan <strong>{startNo}–{startNo + pageItems.length - 1}</strong> dari <strong>{allItems.length}</strong> penyelenggara terkurasi.
+</div>
+
+<!-- SSR Static Crawlable View -->
+<div id="staticDirectory">
+  <div class="lomba-list">
+    {
+      pageItems.map((item, idx) => (
+        <>
+          <LombaCard item={item} indexNo={startNo + idx} />
+          {(idx + 1) % 8 === 0 && idx + 1 < pageItems.length && (
+            <AdSlot type="infeed" slotId={SITE.ads.slots.inFeed} />
+          )}
+        </>
+      ))
+    }
+  </div>
+
+  {
+    totalPages > 1 && (
+      <nav class="pagination" aria-label="Navigasi Halaman">
+        <div class="mono" style="font-size:12px;color:var(--text-muted);">
+          Halaman <strong>{currentPage}</strong> / <strong>{totalPages}</strong>
+        </div>
+        <div class="page-links">
+          {currentPage > 1 && (
+            <a class="page-link" href={pageHref(currentPage - 1)}>
+              Prev
+            </a>
+          )}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <a class={`page-link ${p === currentPage ? "active" : ""}`} href={pageHref(p)}>
+              {p}
+            </a>
+          ))}
+          {currentPage < totalPages && (
+            <a class="page-link" href={pageHref(currentPage + 1)}>
+              Next
+            </a>
+          )}
+        </div>
+      </nav>
+    )
+  }
+</div>
+
+<!-- Client-side Dynamic Filtered View -->
+<div id="dynamicDirectory" class="hidden">
+  <div id="dynamicList" class="lomba-list"></div>
+  <div id="dynamicPagination" class="pagination hidden"></div>
+</div>
+
+<script is:inline define:vars={{ compactData, perPage: SITE.perPage, adsenseClient: SITE.ads.adsenseClient, inFeedSlot: SITE.ads.slots.inFeed, showPlaceholders: SITE.ads.showPlaceholders }}>
+  (function () {
+    const TODAY = "2026-11-15";
+    const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const STATUS_PRIORITY = {
+      "Pendaftaran Dibuka": 1,
+      "Sedang Berlangsung": 2,
+      "Akan Datang (Terjadwal)": 3,
+      "Estimasi Siklus Tahunan": 4,
+      "Belum Ada Info Terbaru": 5,
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const staticDir = $("staticDirectory");
+    const dynDir = $("dynamicDirectory");
+    const dynList = $("dynamicList");
+    const dynPag = $("dynamicPagination");
+    const metaEl = $("directoryMeta");
+    const defaultMetaHtml = metaEl ? metaEl.innerHTML : "";
+    const advIds = ["fStatus", "fTimeWindow", "fRating", "fCluster", "fLevel", "fJenjang", "fMode", "fCountry"];
+
+    function updateFilterIndicators() {
+      let activeAdv = 0;
+      const summary = [];
+      const qVal = ($("fSearch")?.value || "").trim();
+      if (qVal) summary.push(`Cari: "${qVal}"`);
+      advIds.forEach((id) => {
+        const el = $(id);
+        if (el && el.value !== "ALL") {
+          activeAdv++;
+          const txt = el.options[el.selectedIndex]?.text || el.value;
+          summary.push(txt);
+        }
+      });
+      const pill = $("filterCountPill");
+      if (pill) {
+        pill.textContent = String(activeAdv);
+        pill.classList.toggle("hidden", activeAdv === 0);
+      }
+      const resetBtn = $("btnResetFilters");
+      if (resetBtn) {
+        resetBtn.classList.toggle("hidden", !hasActiveFilters());
+      }
+      return summary;
+    }
+
+    let currentFiltered = compactData.slice();
+    let dynPage = 1;
+
+    function esc(v) {
+      return String(v ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function fmtDate(d) {
+      if (!d || d === "-") return "-";
+      const m1 = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m1) return `${parseInt(m1[3], 10)} ${MONTHS[parseInt(m1[2], 10)] || m1[2]} ${m1[1]}`;
+      const m2 = d.match(/^(\d{4})-(\d{2})$/);
+      if (m2) return `${MONTHS[parseInt(m2[2], 10)] || m2[2]} ${m2[1]}`;
+      return d;
+    }
+
+    function countdownHtml(r) {
+      if (!r.effectiveSort || r.effectiveSort === "9999-12-31") return "";
+      if (r.effectiveSort === TODAY) return `<span class="cd-pill cd-now">Aktif / Berlangsung</span>`;
+      const diff = Math.round((new Date(r.effectiveSort + "T00:00:00Z") - new Date(TODAY + "T00:00:00Z")) / 86400000);
+      if (diff >= 0 && diff <= 30) return `<span class="cd-pill cd-soon">${r.isExactStart ? "" : "~"}${diff} hari lagi</span>`;
+      if (diff > 30 && diff <= 90) return `<span class="cd-pill cd-mid">${r.isExactStart ? "" : "Est. "}${Math.round(diff / 30)} bulan lagi</span>`;
+      if (diff > 90) return `<span class="cd-pill cd-far">${r.isExactStart ? "" : "Est. "}${Math.round(diff / 30)} bulan lagi</span>`;
+      return "";
+    }
+
+    function statusCls(st) {
+      return {
+        "Pendaftaran Dibuka": "st-open",
+        "Sedang Berlangsung": "st-live",
+        "Akan Datang (Terjadwal)": "st-sched",
+        "Estimasi Siklus Tahunan": "st-est",
+        "Belum Ada Info Terbaru": "st-none",
+      }[st] || "st-none";
+    }
+
+    function modeCls(mt) {
+      return {
+        "Online / Daring": "b-mode-online",
+        "Offline / Luring": "b-mode-offline",
+        Hybrid: "b-mode-hybrid",
+      }[mt] || "b-mode-unk";
+    }
+
+    function matchTW(r, tw) {
+      if (tw === "ALL") return true;
+      if (tw === "HAS_DEADLINE") return r.regDeadline && r.regDeadline !== "-";
+      const es = r.effectiveSort || "9999-12-31";
+      const st = r.start || "-";
+      if (tw === "ACTIVE_NOV") return es >= "2026-11-15" && es <= "2026-11-30";
+      if (tw === "DEC_2026") return st.startsWith("2026-12") || (es >= "2026-12-01" && es <= "2026-12-31");
+      if (tw === "LATE_2026") return es >= "2026-11-15" && es <= "2026-12-31";
+      if (tw === "Q1_2027") return es >= "2027-01-01" && es <= "2027-03-31";
+      if (tw === "Q2_2027") return es >= "2027-04-01" && es <= "2027-06-30";
+      if (tw === "H2_2027") return es >= "2027-07-01" && es <= "2027-12-31";
+      return true;
+    }
+
+    function hasActiveFilters() {
+      const ids = ["fSearch", "fStatus", "fTimeWindow", "fRating", "fCluster", "fLevel", "fJenjang", "fMode", "fCountry", "fSort"];
+      for (const id of ids) {
+        const el = $(id);
+        if (!el) continue;
+        if (id === "fSearch" && el.value.trim() !== "") return true;
+        if (id === "fSort" && el.value !== "nearest_asc") return true;
+        if (id !== "fSearch" && id !== "fSort" && el.value !== "ALL") return true;
+      }
+      return false;
+    }
+
+    function renderAdHtml() {
+      if (!(adsenseClient && inFeedSlot) && !showPlaceholders) return "";
+      return `
+        <aside class="ad-slot ad-infeed" aria-label="Area Iklan">
+          <div class="ad-label">Iklan</div>
+          <div class="ad-body"><span>Slot Iklan In-Feed Native (Responsif)</span></div>
+        </aside>
+      `;
+    }
+
+    function renderDynamic() {
+      const total = currentFiltered.length;
+      const totalPages = Math.max(1, Math.ceil(total / perPage));
+      if (dynPage > totalPages) dynPage = totalPages;
+      const sIdx = (dynPage - 1) * perPage;
+      const slice = currentFiltered.slice(sIdx, sIdx + perPage);
+
+      const summary = updateFilterIndicators();
+      const summaryHtml = summary.length ? ` · <span style="color:var(--primary);">${esc(summary.join(" · "))}</span>` : "";
+      metaEl.innerHTML =
+        total === 0
+          ? `Tidak ada lomba yang cocok dengan filter saat ini.${summaryHtml}`
+          : `Menampilkan <strong>${sIdx + 1}–${Math.min(sIdx + perPage, total)}</strong> dari <strong>${total}</strong> hasil filter${summaryHtml}`;
+
+      if (slice.length === 0) {
+        dynList.innerHTML = `<div class="panel" style="text-align:center;color:var(--text-muted);">Tidak ada hasil yang cocok. Klik <strong>Reset Filter</strong> untuk melihat semua data.</div>`;
+        dynPag.classList.add("hidden");
+        return;
+      }
+
+      const chunks = [];
+      slice.forEach((x, idx) => {
+        const no = sIdx + idx + 1;
+        const stars = "★".repeat(x.rating) + `<span class="dim">${"☆".repeat(5 - x.rating)}</span>`;
+        const href = `/penyelenggara/${x.slug}/`;
+        const dateStr = x.start === "-" ? "Belum diumumkan" : `${x.isExactStart ? "" : "Est. "}${fmtDate(x.start)}${x.end !== "-" && x.end !== x.start ? " – " + fmtDate(x.end) : ""}`;
+        const brPreview =
+          x.topBranches && x.topBranches.length
+            ? `<div class="lomba-branches-preview"><strong>Cabang utama:</strong> ${esc(x.topBranches.join(", "))}${x.branchesCnt > x.topBranches.length ? ` (+${x.branchesCnt - x.topBranches.length} lainnya)` : ""}</div>`
+            : "";
+
+        chunks.push(`
+          <article class="lomba-card">
+            <div>
+              <div class="lomba-head-meta">
+                <span class="row-idx">#${String(no).padStart(2, "0")}</span>
+                <span class="badge ${statusCls(x.status)}">${esc(x.status)}</span>
+                <span class="stars">${stars}</span>
+                <span class="mono" style="font-size:11.5px;color:var(--text-muted);">${x.avgScore !== null ? "Skor " + x.avgScore : x.rating + "★"} · ${x.compsCnt} ajang · ${x.branchesCnt} cabang</span>
+              </div>
+              <h3 class="lomba-title"><a href="${href}">${esc(x.event !== "-" ? x.event : x.org)}</a></h3>
+              <div class="lomba-org">${esc(x.org)}${x.orgShort ? " (" + esc(x.orgShort) + ")" : ""} · ${esc(x.country)}</div>
+              ${brPreview}
+              <p class="lomba-notes">${esc(x.notes)}</p>
+              <div class="badge-row">
+                ${x.clusters.map((c) => `<span class="badge b-cluster">${esc(c)}</span>`).join("")}
+                ${x.levels.map((l) => `<span class="badge b-level">${esc(l)}</span>`).join("")}
+                <span class="badge ${modeCls(x.modeType)}">${esc(x.modeType)}</span>
+              </div>
+              <div class="lomba-actions">
+                <a class="btn btn-primary btn-sm" href="${href}">Detail &amp; ${x.branchesCnt} Cabang</a>
+                ${x.sourceUrl ? `<a class="btn btn-sm" href="${esc(x.sourceUrl)}" target="_blank" rel="noopener nofollow">Sumber Resmi ↗</a>` : ""}
+                <button type="button" class="btn btn-sm btn-save" data-save-slug="${x.slug}" onclick="toggleSaveLomba('${x.slug}')">Simpan</button>
+              </div>
+            </div>
+            <div class="lomba-side">
+              <div class="side-kv">
+                <div class="side-k">Pelaksanaan Terdekat</div>
+                <div class="side-v mono" style="font-size:12.5px;">${esc(dateStr)}</div>
+                ${countdownHtml(x)}
+              </div>
+              <div class="side-kv">
+                <div class="side-k">Batas Pendaftaran</div>
+                <div class="side-v mono" style="font-size:12.5px;color:${x.regDeadline !== "-" ? "var(--red-fg)" : "var(--text-soft)"};">${x.regDeadline !== "-" ? esc(fmtDate(x.regDeadline)) : "Lihat situs panitia"}</div>
+              </div>
+              <div class="side-kv">
+                <div class="side-k">Jenjang &amp; Lokasi</div>
+                <div class="side-v" style="font-weight:500;font-size:12px;color:var(--text-muted);">${esc(x.jenjang)}</div>
+                <div style="font-size:11.5px;color:var(--text-soft);margin-top:2px;">${esc(x.modeLokasi)}</div>
+              </div>
+            </div>
+          </article>
+        `);
+        if ((idx + 1) % 8 === 0 && idx + 1 < slice.length) {
+          chunks.push(renderAdHtml());
+        }
+      });
+
+      dynList.innerHTML = chunks.join("");
+      if (window.syncSaveButtons) window.syncSaveButtons();
+
+      if (totalPages > 1) {
+        dynPag.classList.remove("hidden");
+        let btns = "";
+        for (let p = 1; p <= totalPages; p++) {
+          btns += `<button type="button" class="page-link ${p === dynPage ? "active" : ""}" data-dyn-page="${p}">${p}</button>`;
+        }
+        dynPag.innerHTML = `<div class="mono" style="font-size:12px;color:var(--text-muted);">Halaman <strong>${dynPage}</strong> / <strong>${totalPages}</strong></div><div class="page-links">${btns}</div>`;
+        dynPag.querySelectorAll("[data-dyn-page]").forEach((b) => {
+          b.addEventListener("click", () => {
+            dynPage = parseInt(b.getAttribute("data-dyn-page"), 10);
+            renderDynamic();
+            window.scrollTo({ top: 180, behavior: "smooth" });
+          });
+        });
+      } else {
+        dynPag.classList.add("hidden");
+      }
+    }
+
+    function applyFilter() {
+      updateFilterIndicators();
+      if (!hasActiveFilters()) {
+        currentFiltered = compactData.slice();
+        if (metaEl) metaEl.innerHTML = defaultMetaHtml;
+        staticDir.classList.remove("hidden");
+        dynDir.classList.add("hidden");
+        return;
+      }
+
+      const q = ($("fSearch")?.value || "").trim().toLowerCase();
+      const st = $("fStatus")?.value || "ALL";
+      const tw = $("fTimeWindow")?.value || "ALL";
+      const rt = $("fRating")?.value || "ALL";
+      const cl = $("fCluster")?.value || "ALL";
+      const lv = $("fLevel")?.value || "ALL";
+      const jj = $("fJenjang")?.value || "ALL";
+      const md = $("fMode")?.value || "ALL";
+      const cn = $("fCountry")?.value || "ALL";
+      const sk = $("fSort")?.value || "nearest_asc";
+
+      currentFiltered = compactData.filter((r) => {
+        if (st === "CONFIRMED_ACTIVE") {
+          if (!["Pendaftaran Dibuka", "Sedang Berlangsung", "Akan Datang (Terjadwal)"].includes(r.status)) return false;
+        } else if (st !== "ALL" && r.status !== st) return false;
+        if (!matchTW(r, tw)) return false;
+        if (rt === "5" && r.rating !== 5) return false;
+        if (rt === "4PLUS" && r.rating < 4) return false;
+        if (rt === "4" && r.rating !== 4) return false;
+        if (rt === "3" && r.rating !== 3) return false;
+        if (cl !== "ALL" && !r.clusters.includes(cl)) return false;
+        if (lv !== "ALL" && !r.levels.includes(lv)) return false;
+        if (jj !== "ALL" && !r.jenjangTags.includes(jj)) return false;
+        if (md !== "ALL" && r.modeType !== md) return false;
+        if (cn === "ID" && r.country !== "Indonesia") return false;
+        if (cn === "INTL" && r.country === "Indonesia") return false;
+        if (q) {
+          for (const tok of q.split(/\s+/).filter(Boolean)) {
+            if (!r.qText.includes(tok)) return false;
+          }
+        }
+        return true;
+      });
+
+      currentFiltered.sort((a, b) => {
+        if (sk === "nearest_asc") {
+          if (a.effectiveSort !== b.effectiveSort) return a.effectiveSort.localeCompare(b.effectiveSort);
+          const pa = STATUS_PRIORITY[a.status] || 9;
+          const pb = STATUS_PRIORITY[b.status] || 9;
+          if (pa !== pb) return pa - pb;
+          return b.rating - a.rating;
+        }
+        if (sk === "deadline_asc") {
+          if (a.regSort !== b.regSort) return a.regSort.localeCompare(b.regSort);
+          return a.effectiveSort.localeCompare(b.effectiveSort);
+        }
+        if (sk === "rating_desc") {
+          if (b.rating !== a.rating) return b.rating - a.rating;
+          return a.effectiveSort.localeCompare(b.effectiveSort);
+        }
+        if (sk === "score_desc") return (b.avgScore || 0) - (a.avgScore || 0);
+        if (sk === "branches_desc") return b.branchesCnt - a.branchesCnt;
+        if (sk === "org_asc") return a.org.localeCompare(b.org, "id");
+        return 0;
+      });
+
+      dynPage = 1;
+      staticDir.classList.add("hidden");
+      dynDir.classList.remove("hidden");
+      renderDynamic();
+    }
+
+    function resetAll() {
+      ["fSearch", "fStatus", "fTimeWindow", "fRating", "fCluster", "fLevel", "fJenjang", "fMode", "fCountry", "fSort"].forEach((id) => {
+        const el = $(id);
+        if (!el) return;
+        if (id === "fSearch") el.value = "";
+        else if (id === "fSort") el.value = "nearest_asc";
+        else el.value = "ALL";
+      });
+    }
+
+    function syncChips() {
+      document.querySelectorAll(".chip-btn[data-chip]").forEach((btn) => btn.classList.remove("active"));
+      if (!hasActiveFilters()) {
+        document.querySelector('.chip-btn[data-chip="ALL"]')?.classList.add("active");
+      }
+    }
+
+    ["fSearch", "fStatus", "fTimeWindow", "fRating", "fCluster", "fLevel", "fJenjang", "fMode", "fCountry", "fSort"].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.addEventListener(id === "fSearch" ? "input" : "change", () => {
+        syncChips();
+        applyFilter();
+      });
+    });
+
+    document.querySelectorAll(".chip-btn[data-chip]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const c = btn.getAttribute("data-chip");
+        resetAll();
+        if (c === "OPEN" && $("fStatus")) $("fStatus").value = "Pendaftaran Dibuka";
+        else if (c === "STAR45" && $("fRating")) $("fRating").value = "4PLUS";
+        else if (c === "ONLINE" && $("fMode")) $("fMode").value = "Online / Daring";
+        else if (c === "SMA" && $("fJenjang")) $("fJenjang").value = "SMA/SMK/MA";
+        else if (c === "SMP" && $("fJenjang")) $("fJenjang").value = "SMP/MTs";
+        else if (c === "MHS" && $("fJenjang")) $("fJenjang").value = "Mahasiswa/DIKTI";
+
+        document.querySelectorAll(".chip-btn[data-chip]").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        applyFilter();
+      });
+    });
+
+    $("btnToggleAdvFilters")?.addEventListener("click", () => {
+      const grid = $("advFilterGrid");
+      const btn = $("btnToggleAdvFilters");
+      if (!grid || !btn) return;
+      const isHidden = grid.classList.toggle("hidden");
+      btn.setAttribute("aria-expanded", String(!isHidden));
+    });
+
+    $("btnResetFilters")?.addEventListener("click", () => {
+      resetAll();
+      syncChips();
+      applyFilter();
+    });
+
+    $("btnExportCsv")?.addEventListener("click", () => {
+      const headers = ["No", "Penyelenggara", "Negara", "Peringkat Kurasi", "Skor", "Klaster", "Level", "Lomba Terdekat", "Status", "Mulai", "Selesai", "Batas Daftar", "Jenjang", "Mode", "Sumber"];
+      const csvEsc = (v) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+      const rows = currentFiltered.map((r, i) =>
+        [i + 1, r.org, r.country, r.rating, r.avgScore ?? "", r.clusters.join("; "), r.levels.join("; "), r.event, r.status, r.start, r.end, r.regDeadline, r.jenjang, r.modeType, r.sourceUrl]
+          .map(csvEsc)
+          .join(",")
+      );
+      const blob = new Blob(["\uFEFF" + headers.map(csvEsc).join(",") + "\n" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "lomba_terkurasi_terfilter.csv";
+      a.click();
+    });
+  })();
+</script>

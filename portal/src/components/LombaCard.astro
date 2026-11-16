@@ -1,0 +1,109 @@
+---
+import {
+  type OrganizerItem,
+  fmtDate,
+  countdownLabel,
+  statusClass,
+  modeClass,
+  starsText,
+} from "../utils/format";
+
+export interface Props {
+  item: OrganizerItem;
+  indexNo?: number;
+}
+
+const { item, indexNo } = Astro.props;
+const stars = starsText(item.rating);
+const cd = countdownLabel(item);
+const detailHref = `/penyelenggara/${item.slug}/`;
+---
+
+<article class="lomba-card">
+  <div>
+    <div class="lomba-head-meta">
+      {indexNo !== undefined && <span class="row-idx">#{String(indexNo).padStart(2, "0")}</span>}
+      <span class={`badge ${statusClass(item.status)}`}>{item.status}</span>
+      <span class="stars" title={`Peringkat Kurasi Bintang ${item.rating}`}>
+        {stars.full}<span class="dim">{stars.empty}</span>
+      </span>
+      <span class="mono" style="font-size:11.5px;color:var(--text-muted);">
+        {item.avgScore !== null ? `Skor ${item.avgScore}` : `${item.rating}★`} · {item.compsCnt} ajang · {item.branchesCnt} cabang
+      </span>
+    </div>
+
+    <h3 class="lomba-title">
+      <a href={detailHref}>
+        {item.event !== "-" ? item.event : item.org}
+      </a>
+    </h3>
+
+    <div class="lomba-org">
+      {item.org}{item.orgShort ? ` (${item.orgShort})` : ""} · {item.country}
+    </div>
+
+    {
+      item.topBranches && item.topBranches.length > 0 && (
+        <div class="lomba-branches-preview">
+          <strong>Cabang utama:</strong> {item.topBranches.join(", ")}
+          {item.branchesCnt > item.topBranches.length ? ` (+${item.branchesCnt - item.topBranches.length} lainnya)` : ""}
+        </div>
+      )
+    }
+
+    <p class="lomba-notes">{item.notes}</p>
+
+    <div class="badge-row">
+      {item.clusters.map((c) => <span class="badge b-cluster">{c}</span>)}
+      {item.levels.map((l) => <span class="badge b-level">{l}</span>)}
+      <span class={`badge ${modeClass(item.modeType)}`}>{item.modeType}</span>
+    </div>
+
+    <div class="lomba-actions">
+      <a class="btn btn-primary btn-sm" href={detailHref}>Detail &amp; {item.branchesCnt} Cabang</a>
+      {
+        item.sourceUrl && (
+          <a class="btn btn-sm" href={item.sourceUrl} target="_blank" rel="noopener nofollow">
+            Sumber Resmi ↗
+          </a>
+        )
+      }
+      <button
+        type="button"
+        class="btn btn-sm btn-save"
+        data-save-slug={item.slug}
+        onclick={`toggleSaveLomba('${item.slug}')`}
+      >
+        Simpan
+      </button>
+    </div>
+  </div>
+
+  <div class="lomba-side">
+    <div class="side-kv">
+      <div class="side-k">Pelaksanaan Terdekat</div>
+      <div class="side-v mono" style="font-size:12.5px;">
+        {item.start === "-" ? "Belum diumumkan" : `${item.isExactStart ? "" : "Est. "}${fmtDate(item.start)}`}
+        {item.end !== "-" && item.end !== item.start ? ` – ${fmtDate(item.end)}` : ""}
+      </div>
+      {cd && <span class={`cd-pill ${cd.tone}`}>{cd.text}</span>}
+    </div>
+
+    <div class="side-kv">
+      <div class="side-k">Batas Pendaftaran</div>
+      <div class="side-v mono" style={`font-size:12.5px;color:${item.regDeadline !== "-" ? "var(--red-fg)" : "var(--text-soft)"};`}>
+        {item.regDeadline !== "-" ? fmtDate(item.regDeadline) : "Lihat situs panitia"}
+      </div>
+    </div>
+
+    <div class="side-kv">
+      <div class="side-k">Jenjang &amp; Lokasi</div>
+      <div class="side-v" style="font-weight:500;font-size:12px;color:var(--text-muted);">
+        {item.jenjang}
+      </div>
+      <div style="font-size:11.5px;color:var(--text-soft);margin-top:2px;">
+        {item.modeLokasi}
+      </div>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /tersimpan/
+
+Sitemap: https://lombakurasi.id/sitemap-index.xml

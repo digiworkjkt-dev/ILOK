@@ -1,0 +1,10 @@
+﻿node_modules/
+portal/node_modules/
+portal/.astro/
+portal/dist/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.env
+.env.*

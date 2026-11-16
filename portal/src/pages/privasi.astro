@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../config/site";
+---
+
+<BaseLayout
+  title={`Kebijakan Privasi — ${SITE.name}`}
+  description="Kebijakan privasi terkait penyimpanan lokal browser, analitik, dan penayangan iklan pihak ketiga termasuk Google AdSense."
+  canonicalPath="/privasi/"
+>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Beranda</a> › <span>Kebijakan Privasi</span>
+  </nav>
+
+  <article class="panel">
+    <h1>Kebijakan Privasi</h1>
+    <p>Pembaruan terakhir: {SITE.referenceDateLabel}</p>
+
+    <h2>1. Data yang Disimpan di Browser Pengguna</h2>
+    <p>
+      Fitur <strong>Simpan Lomba</strong> pada situs ini bekerja sepenuhnya menggunakan penyimpanan lokal browser (<em>localStorage</em>) pada perangkat Anda. Kami tidak mengumpulkan akun, kata sandi, atau data pribadi peserta ke server kami saat Anda menandai lomba.
+    </p>
+
+    <h2>2. Cookie dan Iklan Pihak Ketiga (Google AdSense)</h2>
+    <p>
+      Situs ini menggunakan atau dapat menggunakan layanan periklanan pihak ketiga seperti <strong>Google AdSense</strong> untuk membiayai operasional riset dan pembaruan jadwal lomba.
+    </p>
+    <ul>
+      <li>
+        Vendor pihak ketiga, termasuk Google, menggunakan cookie untuk menayangkan iklan berdasarkan kunjungan pengguna sebelumnya ke situs ini atau situs lain di internet.
+      </li>
+      <li>
+        Penggunaan cookie periklanan oleh Google memungkinkan Google dan mitranya menayangkan iklan yang relevan kepada pengguna.
+      </li>
+      <li>
+        Pengguna dapat memilih keluar dari iklan yang dipersonalisasi dengan mengunjungi halaman <a href="https://adssettings.google.com" target="_blank" rel="noopener">Setelan Iklan Google</a> atau melalui <a href="https://www.aboutads.info" target="_blank" rel="noopener">aboutads.info</a>.
+      </li>
+    </ul>
+
+    <h2>3. Tautan Eksternal</h2>
+    <p>
+      Situs ini memuat tautan menuju situs resmi masing-masing penyelenggara lomba. Kami tidak bertanggung jawab atas praktik privasi maupun isi dari situs eksternal tersebut.
+    </p>
+
+    <h2>4. Kontak Privasi</h2>
+    <p>
+      Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini, hubungi kami melalui email di <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>.
+    </p>
+  </article>
+</BaseLayout>
