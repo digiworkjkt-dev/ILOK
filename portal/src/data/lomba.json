@@ -575,7 +575,7 @@
     "regDeadline": "2026-11",
     "effectiveSort": "2026-11-15",
     "isExactStart": true,
-    "regSort": "2026-11-28",
+    "regSort": "2026-11-30",
     "jenjang": "SD dan SMP (Primary & Junior High School)",
     "jenjangTags": [
       "SD/MI",
@@ -3903,7 +3903,7 @@
     "regDeadline": "2026-11",
     "effectiveSort": "2026-11-28",
     "isExactStart": true,
-    "regSort": "2026-11-28",
+    "regSort": "2026-11-30",
     "jenjang": "SD, SMP, SMA",
     "jenjangTags": [
       "SD/MI",
@@ -5080,7 +5080,7 @@
     "regDeadline": "2026-12",
     "effectiveSort": "2026-12-12",
     "isExactStart": true,
-    "regSort": "2026-12-28",
+    "regSort": "2026-12-31",
     "jenjang": "SMP, SMA, dan Mahasiswa / Pemuda (Usia 11–25 tahun)",
     "jenjangTags": [
       "SMP/MTs",
@@ -5825,7 +5825,7 @@
     "regDeadline": "2026-10",
     "effectiveSort": "2026-12-15",
     "isExactStart": false,
-    "regSort": "2026-10-28",
+    "regSort": "2026-10-31",
     "jenjang": "Siswa SMP/MTs dan SMA/SMK/MA sederajat",
     "jenjangTags": [
       "SMP/MTs",
@@ -6200,7 +6200,7 @@
     "regDeadline": "2026-10",
     "effectiveSort": "2026-12-15",
     "isExactStart": false,
-    "regSort": "2026-10-28",
+    "regSort": "2026-10-31",
     "jenjang": "SD, SMP, SMA sederajat",
     "jenjangTags": [
       "SD/MI",
@@ -6398,7 +6398,7 @@
     "regDeadline": "2026-11",
     "effectiveSort": "2026-12-15",
     "isExactStart": false,
-    "regSort": "2026-11-28",
+    "regSort": "2026-11-30",
     "jenjang": "SD (Primary), SMP/SMA (Secondary), dan Perguruan Tinggi (University)",
     "jenjangTags": [
       "SD/MI",
@@ -7377,7 +7377,7 @@
     "regDeadline": "2026-12",
     "effectiveSort": "2026-12-17",
     "isExactStart": true,
-    "regSort": "2026-12-28",
+    "regSort": "2026-12-31",
     "jenjang": "Super Kids, Cadet, Junior, Senior (Usia Dini, Pelajar SD/SMP/SMA, Mahasiswa, Umum)",
     "jenjangTags": [
       "SD/MI",
@@ -7477,7 +7477,7 @@
     "regDeadline": "2026-11",
     "effectiveSort": "2026-12-17",
     "isExactStart": true,
-    "regSort": "2026-11-28",
+    "regSort": "2026-11-30",
     "jenjang": "Kids, Teens, Adults, Seniors (Pelajar SD/SMP/SMA hingga Umum)",
     "jenjangTags": [
       "SD/MI",
@@ -7655,7 +7655,7 @@
     "regDeadline": "2026-12",
     "effectiveSort": "2026-12-19",
     "isExactStart": true,
-    "regSort": "2026-12-28",
+    "regSort": "2026-12-31",
     "jenjang": "SD/MI, SMP/MTs, SMA/MA (Kelas 1–12, terbagi divisi Gecko, Salamander, Chameleon, Iguana, Dragon)",
     "jenjangTags": [
       "SD/MI",
@@ -7816,7 +7816,7 @@
     "regDeadline": "2026-12",
     "effectiveSort": "2026-12-21",
     "isExactStart": true,
-    "regSort": "2026-12-28",
+    "regSort": "2026-12-31",
     "jenjang": "Pelajar (SD, SMP, SMA) dan Mahasiswa (Tingkat Pelajar & Mahasiswa Terbuka Nasional)",
     "jenjangTags": [
       "SD/MI",
@@ -12145,7 +12145,7 @@
     "regDeadline": "2027-04",
     "effectiveSort": "2027-02-15",
     "isExactStart": false,
-    "regSort": "2027-04-28",
+    "regSort": "2027-04-30",
     "jenjang": "PAUD, SD, SMP, SMA/SMK, SLB, SILN",
     "jenjangTags": [
       "PAUD/TK",
@@ -13162,7 +13162,7 @@
     "regDeadline": "2027-04",
     "effectiveSort": "2027-03-15",
     "isExactStart": false,
-    "regSort": "2027-04-28",
+    "regSort": "2027-04-30",
     "jenjang": "SD/MI, SMP/MTs, SMA/MA/SMK, Pondok Pesantren, serta Guru Pembimbing",
     "jenjangTags": [
       "SD/MI",
@@ -13617,7 +13617,7 @@
     "regDeadline": "2027-06",
     "effectiveSort": "2027-04-15",
     "isExactStart": false,
-    "regSort": "2027-06-28",
+    "regSort": "2027-06-30",
     "jenjang": "Pelajar / Mahasiswa / Pemuda usia 16–23 tahun (Paduan Suara dan Orkestra)",
     "jenjangTags": [
       "Mahasiswa/DIKTI"
@@ -14451,7 +14451,7 @@
     "regDeadline": "2027-04",
     "effectiveSort": "2027-05-15",
     "isExactStart": false,
-    "regSort": "2027-04-28",
+    "regSort": "2027-04-30",
     "jenjang": "Siswa SMA/SMK/MA (≥17 tahun), Mahasiswa, Guru, Dosen",
     "jenjangTags": [
       "SMA/SMK/MA",
@@ -14514,7 +14514,7 @@
     "regDeadline": "2027-05",
     "effectiveSort": "2027-05-15",
     "isExactStart": false,
-    "regSort": "2027-05-28",
+    "regSort": "2027-05-31",
     "jenjang": "SD/MI (khususnya siswa kelas IV)",
     "jenjangTags": [
       "SD/MI"
@@ -14831,7 +14831,7 @@
     "regDeadline": "2027-09",
     "effectiveSort": "2027-05-15",
     "isExactStart": false,
-    "regSort": "2027-09-28",
+    "regSort": "2027-09-30",
     "jenjang": "SD dan SMP",
     "jenjangTags": [
       "SD/MI",
@@ -14897,7 +14897,7 @@
     "regDeadline": "2027-04",
     "effectiveSort": "2027-05-15",
     "isExactStart": false,
-    "regSort": "2027-04-28",
+    "regSort": "2027-04-30",
     "jenjang": "SD (Kelas 4–6), SMP, SMA/SMK, dan Perguruan Tinggi (Undergraduate, usia 10–24 tahun)",
     "jenjangTags": [
       "SD/MI",
@@ -17522,7 +17522,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-06-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SMA/SMK dan Mahasiswa",
     "jenjangTags": [
       "SMA/SMK/MA",
@@ -17642,7 +17642,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-07-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SMA/MA/sederajat dan Mahasiswa (Perguruan Tinggi)",
     "jenjangTags": [
       "SMA/SMK/MA",
@@ -17775,7 +17775,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-07-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SMA / MA / SMK / Sederajat",
     "jenjangTags": [
       "SMA/SMK/MA"
@@ -17933,7 +17933,7 @@
     "regDeadline": "2027-07",
     "effectiveSort": "2027-07-15",
     "isExactStart": false,
-    "regSort": "2027-07-28",
+    "regSort": "2027-07-31",
     "jenjang": "SD, SMP, SMA/SMK, Perguruan Tinggi (Mahasiswa), dan Guru",
     "jenjangTags": [
       "SD/MI",
@@ -18620,7 +18620,7 @@
     "regDeadline": "2027-07",
     "effectiveSort": "2027-07-15",
     "isExactStart": false,
-    "regSort": "2027-07-28",
+    "regSort": "2027-07-31",
     "jenjang": "SD / Sederajat (Usia 10-12 Tahun)",
     "jenjangTags": [
       "SD/MI",
@@ -18737,7 +18737,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-08-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SMK (TKJ, TJKT, SIJA)",
     "jenjangTags": [
       "SMA/SMK/MA"
@@ -18992,7 +18992,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-08-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SD, SMP, SMA/Sederajat, Mahasiswa, Guru",
     "jenjangTags": [
       "SD/MI",
@@ -19065,7 +19065,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-08-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SMA / SMK / MA sederajat",
     "jenjangTags": [
       "SMA/SMK/MA"
@@ -19353,7 +19353,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-08-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "MI/SD, MTs/SMP, MA/SMA/sederajat",
     "jenjangTags": [
       "SD/MI",
@@ -19533,7 +19533,7 @@
     "regDeadline": "2027-06",
     "effectiveSort": "2027-09-15",
     "isExactStart": false,
-    "regSort": "2027-06-28",
+    "regSort": "2027-06-30",
     "jenjang": "SMA/SMK/Sederajat (B-BRAVE), Mahasiswa D4/S1 (BRINathon), Mahasiswa S2 (B-Creative)",
     "jenjangTags": [
       "SMA/SMK/MA",
@@ -19610,7 +19610,7 @@
     "regDeadline": "2027-06",
     "effectiveSort": "2027-09-15",
     "isExactStart": false,
-    "regSort": "2027-06-28",
+    "regSort": "2027-06-30",
     "jenjang": "Mahasiswa, Peneliti, Inventor Muda / Umum (Kategori Future Star Award untuk pelajar/mahasiswa)",
     "jenjangTags": [
       "Mahasiswa/DIKTI",
@@ -19973,7 +19973,7 @@
     "regDeadline": "2027-08",
     "effectiveSort": "2027-09-15",
     "isExactStart": false,
-    "regSort": "2027-08-28",
+    "regSort": "2027-08-31",
     "jenjang": "SD, SMP, SMA/Sederajat",
     "jenjangTags": [
       "SD/MI",
@@ -20733,7 +20733,7 @@
     "regDeadline": "2027-11",
     "effectiveSort": "2027-10-15",
     "isExactStart": false,
-    "regSort": "2027-11-28",
+    "regSort": "2027-11-30",
     "jenjang": "Pelajar (SMA/SMK), Mahasiswa, dan Umum",
     "jenjangTags": [
       "SMA/SMK/MA",
@@ -20975,7 +20975,7 @@
     "regDeadline": "2027-09",
     "effectiveSort": "2027-10-15",
     "isExactStart": false,
-    "regSort": "2027-09-28",
+    "regSort": "2027-09-30",
     "jenjang": "Siswa SMA/SMK/MA dan Mahasiswa (Varsity)",
     "jenjangTags": [
       "SMA/SMK/MA",
@@ -21432,7 +21432,7 @@
     "regDeadline": "2027-09",
     "effectiveSort": "2027-10-15",
     "isExactStart": false,
-    "regSort": "2027-09-28",
+    "regSort": "2027-09-30",
     "jenjang": "SMP/MTs dan SMA/MA/Sederajat",
     "jenjangTags": [
       "SMP/MTs",
@@ -21694,7 +21694,7 @@
     "regDeadline": "2027-10",
     "effectiveSort": "2027-10-15",
     "isExactStart": false,
-    "regSort": "2027-10-28",
+    "regSort": "2027-10-31",
     "jenjang": "SD, SMP, SMA/SMK, Mahasiswa",
     "jenjangTags": [
       "SD/MI",

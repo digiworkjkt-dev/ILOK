@@ -96,7 +96,11 @@ const items = raw.map((item, idx) => {
 
   let regSort = "9999-12-31";
   if (/^\d{4}-\d{2}-\d{2}$/.test(regRaw)) regSort = regRaw;
-  else if (/^\d{4}-\d{2}$/.test(regRaw)) regSort = `${regRaw}-28`;
+  else if (/^\d{4}-\d{2}$/.test(regRaw)) {
+    const [y, m] = regRaw.split("-").map(Number);
+    const lastDay = String(new Date(Date.UTC(y, m, 0)).getUTCDate()).padStart(2, "0");
+    regSort = `${regRaw}-${lastDay}`;
+  }
 
   const simtComps = (item.simt_competitions || []).map((c) => ({
     name: c.name || "",

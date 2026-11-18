@@ -111,6 +111,78 @@ export function modeClass(mt: string): string {
   return map[mt] || "b-mode-unk";
 }
 
+export const EXPIRING_SOON_DAYS = 3;
+export const ACTIVE_DEADLINE_STATUSES = [
+  "Pendaftaran Dibuka",
+  "Sedang Berlangsung",
+  "Akan Datang (Terjadwal)",
+];
+
+export interface DeadlineCandidate {
+  slug: string;
+  event: string;
+  org: string;
+  jenjang: string;
+  regDeadline: string;
+  regSort: string;
+  rating: number;
+  status: string;
+}
+
+export interface UrgentDeadlineEntry extends DeadlineCandidate {
+  daysLeft: number | null;
+  expiringSoon: boolean;
+}
+
+/** Return today's date in YYYY-MM-DD for the given timezone (defaults to WIB / Asia/Jakarta). */
+export function getTodayIso(timeZone = "Asia/Jakarta"): string {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+  } catch {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  }
+}
+
+/** Format tooltip message for deadlines expiring within the attention window. */
+export function expiringTitle(daysLeft: number | null): string | undefined {
+  if (daysLeft === null || daysLeft < 0 || daysLeft > EXPIRING_SOON_DAYS) return undefined;
+  return daysLeft === 0
+    ? "Batas pendaftaran berakhir hari ini!"
+    : `Segera berakhir (${daysLeft} hari lagi)`;
+}
+
+/** Filter out deadlines already past todayIso, sort nearest first, and mark entries expiring within EXPIRING_SOON_DAYS. */
+export function getUrgentDeadlines(
+  items: DeadlineCandidate[],
+  todayIso: string,
+  limit = 5
+): UrgentDeadlineEntry[] {
+  return items
+    .filter(
+      (x) =>
+        x.regSort !== "9999-12-31" &&
+        x.regSort >= todayIso &&
+        ACTIVE_DEADLINE_STATUSES.includes(x.status)
+    )
+    .sort((a, b) => a.regSort.localeCompare(b.regSort) || b.rating - a.rating)
+    .slice(0, limit)
+    .map((x) => {
+      const daysLeft = daysFromRef(x.regSort, todayIso);
+      return {
+        ...x,
+        daysLeft,
+        expiringSoon: daysLeft !== null && daysLeft >= 0 && daysLeft <= EXPIRING_SOON_DAYS,
+      };
+    });
+}
+
 export function starsText(n: number): { full: string; empty: string } {
   const clamped = Math.max(0, Math.min(5, n));
   return {

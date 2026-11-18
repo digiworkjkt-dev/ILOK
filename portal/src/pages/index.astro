@@ -3,7 +3,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import AdSlot from "../components/AdSlot.astro";
 import DirectoryView from "../components/DirectoryView.astro";
 import rawLomba from "../data/lomba.json";
-import { type OrganizerItem, fmtDate } from "../utils/format";
+import {
+  type OrganizerItem,
+  type DeadlineCandidate,
+  ACTIVE_DEADLINE_STATUSES,
+  fmtDate,
+  getTodayIso,
+  getUrgentDeadlines,
+  expiringTitle,
+} from "../utils/format";
 import { SITE } from "../config/site";
 import { HUBS } from "../data/hubs";
 import { GUIDES } from "../data/guides";
@@ -19,11 +27,22 @@ const star45Cnt = allItems.filter((x) => x.rating >= 4).length;
 const totalComps = allItems.reduce((s, x) => s + x.compsCnt, 0);
 const totalBranches = allItems.reduce((s, x) => s + x.branchesCnt, 0);
 
-// Top 5 urgent deadlines >= 2026-11-15
-const urgentDeadlines = allItems
-  .filter((x) => x.regSort !== "9999-12-31" && x.regSort >= "2026-11-15" && ["Pendaftaran Dibuka", "Sedang Berlangsung", "Akan Datang (Terjadwal)"].includes(x.status))
+// Top 5 urgent deadlines >= current running day (re-evaluated client-side on page load as well)
+const buildToday = getTodayIso();
+const deadlineCandidates: DeadlineCandidate[] = allItems
+  .filter((x) => x.regSort !== "9999-12-31" && ACTIVE_DEADLINE_STATUSES.includes(x.status))
   .sort((a, b) => a.regSort.localeCompare(b.regSort) || b.rating - a.rating)
-  .slice(0, 5);
+  .map((x) => ({
+    slug: x.slug,
+    event: x.event,
+    org: x.org,
+    jenjang: x.jenjang,
+    regDeadline: x.regDeadline,
+    regSort: x.regSort,
+    rating: x.rating,
+    status: x.status,
+  }));
+const urgentDeadlines = getUrgentDeadlines(deadlineCandidates, buildToday, 5);
 
 // Top 5 ongoing / starting soon
 const imminentEvents = allItems
@@ -92,21 +111,37 @@ const jsonLd = {
         <h2>Batas Pendaftaran Terdekat</h2>
         <a href="/kategori/pendaftaran-dibuka/">Semua dibuka →</a>
       </div>
-      {
-        urgentDeadlines.map((d) => (
-          <div class="digest-row">
-            <span class="digest-date urgent">Tutup {fmtDate(d.regDeadline)}</span>
-            <div>
-              <a href={`/penyelenggara/${d.slug}/`} style="font-weight:600;color:var(--text);">
-                {d.event !== "-" ? d.event : d.org}
-              </a>
-              <div style="font-size:12px;color:var(--text-soft);">
-                {d.org} · {d.jenjang}
+      <div id="urgentDeadlinesList" data-rendered-date={buildToday}>
+        {
+          urgentDeadlines.length === 0 ? (
+            <div class="digest-empty">Belum ada batas pendaftaran terdekat yang aktif saat ini.</div>
+          ) : (
+            urgentDeadlines.map((d) => (
+              <div class="digest-row">
+                <span
+                  class={`digest-date urgent${d.expiringSoon ? " expiring-soon" : ""}`}
+                  title={expiringTitle(d.daysLeft)}
+                >
+                  Tutup {fmtDate(d.regDeadline)}
+                </span>
+                <div>
+                  <a href={`/penyelenggara/${d.slug}/`} style="font-weight:600;color:var(--text);">
+                    {d.event !== "-" ? d.event : d.org}
+                  </a>
+                  <div style="font-size:12px;color:var(--text-soft);">
+                    {d.org} · {d.jenjang}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))
-      }
+            ))
+          )
+        }
+      </div>
+      <script
+        type="application/json"
+        id="deadlineCandidatesData"
+        set:html={JSON.stringify(deadlineCandidates).replace(/</g, "\\u003c")}
+      />
     </div>
 
     <div class="digest-box">
@@ -185,4 +220,84 @@ const jsonLd = {
       <AdSlot type="sidebar-sticky" slotId={SITE.ads.slots.sidebarSticky} />
     </aside>
   </div>
+
+  <script>
+    import {
+      type DeadlineCandidate,
+      type UrgentDeadlineEntry,
+      fmtDate,
+      getTodayIso,
+      getUrgentDeadlines,
+      expiringTitle,
+    } from "../utils/format";
+
+    function buildDeadlineRow(d: UrgentDeadlineEntry): HTMLDivElement {
+      const row = document.createElement("div");
+      row.className = "digest-row";
+
+      const badge = document.createElement("span");
+      badge.className = `digest-date urgent${d.expiringSoon ? " expiring-soon" : ""}`;
+      const tooltip = expiringTitle(d.daysLeft);
+      if (tooltip) badge.title = tooltip;
+      badge.textContent = `Tutup ${fmtDate(d.regDeadline)}`;
+
+      const info = document.createElement("div");
+      const link = document.createElement("a");
+      link.href = `/penyelenggara/${encodeURIComponent(d.slug)}/`;
+      link.style.cssText = "font-weight:600;color:var(--text);";
+      link.textContent = d.event !== "-" ? d.event : d.org;
+
+      const sub = document.createElement("div");
+      sub.style.cssText = "font-size:12px;color:var(--text-soft);";
+      sub.textContent = `${d.org} · ${d.jenjang}`;
+
+      info.append(link, sub);
+      row.append(badge, info);
+      return row;
+    }
+
+    function initUrgentDeadlinesSync() {
+      const listEl = document.getElementById("urgentDeadlinesList");
+      const dataEl = document.getElementById("deadlineCandidatesData");
+      if (!listEl || !dataEl) return;
+
+      let candidates: DeadlineCandidate[] = [];
+      try {
+        candidates = JSON.parse(dataEl.textContent || "[]");
+      } catch {
+        return;
+      }
+
+      let renderedDate = listEl.getAttribute("data-rendered-date") || "";
+
+      const sync = () => {
+        const todayIso = getTodayIso();
+        if (todayIso === renderedDate) return;
+        renderedDate = todayIso;
+        listEl.setAttribute("data-rendered-date", todayIso);
+
+        const active = getUrgentDeadlines(candidates, todayIso, 5);
+        if (active.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "digest-empty";
+          empty.textContent = "Belum ada batas pendaftaran terdekat yang aktif saat ini.";
+          listEl.replaceChildren(empty);
+          return;
+        }
+        listEl.replaceChildren(...active.map(buildDeadlineRow));
+      };
+
+      sync();
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) sync();
+      });
+      window.setInterval(sync, 60000);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initUrgentDeadlinesSync);
+    } else {
+      initUrgentDeadlinesSync();
+    }
+  </script>
 </BaseLayout>
