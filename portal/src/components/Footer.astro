@@ -6,9 +6,9 @@ import { SITE } from "../config/site";
   <div class="container">
     <div class="footer-grid">
       <div>
-        <h4>{SITE.name}</h4>
+        <h4>{SITE.name} ({SITE.domain})</h4>
         <p style="margin:0 0 10px; line-height:1.55;">
-          Direktori jadwal lomba terdekat berstandar kurasi bintang 3★ ke atas di tingkat nasional dan internasional. Acuan waktu riset: <strong>{SITE.referenceDateLabel}</strong>.
+          Direktori jadwal lomba terdekat berstandar kurasi bintang 3★ ke atas di tingkat nasional dan internasional. Pembaruan portal: <strong>{SITE.lastUpdatedLabel}</strong>.
         </p>
       </div>
       <div>
@@ -44,7 +44,7 @@ import { SITE } from "../config/site";
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 {SITE.name}. Direktori Lomba Terkurasi Nasional &amp; Internasional.</span>
+      <span>© 2026 {SITE.name} · <a href={SITE.url}>{SITE.domain}</a>. Direktori Lomba Terkurasi Nasional &amp; Internasional.</span>
       <span>Sumber jadwal: Penelusuran &amp; Verifikasi Situs Resmi Penyelenggara.</span>
     </div>
   </div>

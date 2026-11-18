@@ -27,12 +27,17 @@ export function getStaticPaths() {
 }
 
 const { allItems, pageItems, currentPage, totalPages } = Astro.props;
+const prevPath = currentPage <= 2 ? "/" : `/halaman/${currentPage - 1}/`;
+const nextPath = currentPage < totalPages ? `/halaman/${currentPage + 1}/` : undefined;
 ---
 
 <BaseLayout
   title={`Daftar Lomba Terkurasi (Halaman ${currentPage}) — ${SITE.name}`}
   description={`Halaman ${currentPage} dari direktori ${allItems.length} penyelenggara lomba terkurasi bintang 3 sampai 5 dengan jadwal terdekat 2026–2027.`}
   canonicalPath={`/halaman/${currentPage}/`}
+  noindex={true}
+  prevPath={prevPath}
+  nextPath={nextPath}
 >
   <nav class="breadcrumb" aria-label="Breadcrumb">
     <a href="/">Beranda</a> / <span>Halaman {currentPage}</span>

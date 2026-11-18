@@ -5,7 +5,7 @@ import { SITE } from "../config/site";
 
 <BaseLayout
   title={`Kebijakan Privasi — ${SITE.name}`}
-  description="Kebijakan privasi terkait penyimpanan lokal browser, analitik, dan penayangan iklan pihak ketiga termasuk Google AdSense."
+  description="Kebijakan privasi terkait penyimpanan lokal browser, analitik trafik, dan penayangan iklan pihak ketiga termasuk Google AdSense."
   canonicalPath="/privasi/"
 >
   <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -14,16 +14,29 @@ import { SITE } from "../config/site";
 
   <article class="panel">
     <h1>Kebijakan Privasi</h1>
-    <p>Pembaruan terakhir: {SITE.referenceDateLabel}</p>
+    <p>Pembaruan terakhir: {SITE.lastUpdatedLabel}</p>
 
     <h2>1. Data yang Disimpan di Browser Pengguna</h2>
     <p>
-      Fitur <strong>Simpan Lomba</strong> pada situs ini bekerja sepenuhnya menggunakan penyimpanan lokal browser (<em>localStorage</em>) pada perangkat Anda. Kami tidak mengumpulkan akun, kata sandi, atau data pribadi peserta ke server kami saat Anda menandai lomba.
+      Fitur <strong>Simpan Lomba</strong> pada <strong>{SITE.domain}</strong> bekerja sepenuhnya menggunakan penyimpanan lokal browser (<em>localStorage</em>) pada perangkat Anda. Kami tidak mengumpulkan akun, kata sandi, atau data pribadi peserta ke server kami saat Anda menandai lomba.
     </p>
 
-    <h2>2. Cookie dan Iklan Pihak Ketiga (Google AdSense)</h2>
+    <h2>2. Analitik &amp; Pemantauan Kinerja Situs</h2>
     <p>
-      Situs ini menggunakan atau dapat menggunakan layanan periklanan pihak ketiga seperti <strong>Google AdSense</strong> untuk membiayai operasional riset dan pembaruan jadwal lomba.
+      Untuk memahami kebutuhan informasi pengunjung serta menjaga kecepatan akses situs, kami dapat menggunakan layanan analitik web seperti <strong>Google Analytics 4</strong>, <strong>Vercel Web Analytics &amp; Speed Insights</strong>, atau <strong>Microsoft Clarity</strong>.
+    </p>
+    <ul>
+      <li>
+        Data yang dicatat bersifat agregat (seperti halaman yang dikunjungi, jenis perangkat, interaksi klik navigasi/filter, dan metrik kinerja halaman).
+      </li>
+      <li>
+        Anda dapat membatasi atau menonaktifkan penggunaan cookie kapan saja melalui pengaturan privasi browser Anda.
+      </li>
+    </ul>
+
+    <h2>3. Cookie dan Iklan Pihak Ketiga (Google AdSense)</h2>
+    <p>
+      Situs ini menggunakan atau dapat menggunakan layanan periklanan pihak ketiga seperti <strong>Google AdSense</strong> untuk membiayai operasional riset, pembaruan jadwal lomba, dan pemeliharaan infrastruktur.
     </p>
     <ul>
       <li>
@@ -37,12 +50,12 @@ import { SITE } from "../config/site";
       </li>
     </ul>
 
-    <h2>3. Tautan Eksternal</h2>
+    <h2>4. Tautan Eksternal</h2>
     <p>
       Situs ini memuat tautan menuju situs resmi masing-masing penyelenggara lomba. Kami tidak bertanggung jawab atas praktik privasi maupun isi dari situs eksternal tersebut.
     </p>
 
-    <h2>4. Kontak Privasi</h2>
+    <h2>5. Kontak Privasi</h2>
     <p>
       Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini, hubungi kami melalui email di <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>.
     </p>

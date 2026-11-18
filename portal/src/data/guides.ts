@@ -16,9 +16,9 @@ export const GUIDES: GuideArticle[] = [
     slug: "arti-bintang-kurasi-lomba-untuk-jalur-prestasi",
     title: "Arti Peringkat Bintang 3 hingga 5 pada Lomba Terkurasi dan Manfaatnya untuk Jalur Prestasi",
     category: "Panduan Kurasi",
-    readMinutes: 6,
+    readMinutes: 7,
     publishedAt: "2026-11-15",
-    updatedAt: "2026-11-15",
+    updatedAt: "2026-11-18",
     excerpt:
       "Memahami cara kerja peringkat bintang kurasi ajang talenta dan mengapa lomba bintang 3 ke atas menjadi patokan penting untuk portofolio akademik maupun seleksi jalur prestasi.",
     relatedHubs: [
@@ -30,24 +30,26 @@ export const GUIDES: GuideArticle[] = [
         heading: "Apa Itu Penilaian Kurasi Ajang Talenta?",
         paragraphs: [
           "Kurasi ajang talenta adalah proses peninjauan kualitas suatu kompetisi berdasarkan rekam jejak penyelenggara, kejelasan pedoman teknis (juknis), objektivitas penjurian, cakupan wilayah peserta, serta konsistensi pelaksanaan.",
-          "Setiap penyelenggara — baik lembaga riset, perguruan tinggi, induk organisasi olahraga, yayasan, maupun penyelenggara independen — dievaluasi berdasarkan standar tata kelola kompetisi yang terukur.",
+          "Setiap penyelenggara — baik lembaga riset, perguruan tinggi, induk organisasi olahraga, yayasan, maupun penyelenggara independen — dievaluasi berdasarkan standar tata kelola kompetisi yang terukur sehingga sertifikat yang diterbitkan memiliki bobot pengakuan yang jelas.",
+          "Di Indonesia, panitia penerimaan peserta didik baru (SPMB/PPDB jalur prestasi), seleksi masuk perguruan tinggi (SNBP & jalur mandiri prestasi), hingga pemberi beasiswa semakin selektif memeriksa reputasi penyelenggara agar hanya prestasi dari kompetisi kredibel yang diperhitungkan.",
         ],
       },
       {
         heading: "Mengapa Memilih Lomba Bintang 3★ ke Atas?",
         paragraphs: [
-          "Dalam direktori ini, kami hanya menampilkan ajang dan cabang kompetisi yang telah memenuhi kriteria kurasi Bintang 3★, 4★, dan 5★ untuk membantu peserta menghindari lomba berisiko rendah kredibilitas.",
+          "Dalam direktori ini, kami hanya menampilkan ajang dan cabang kompetisi yang telah memenuhi kriteria kurasi Bintang 3★, 4★, dan 5★ untuk membantu peserta menghindari lomba berisiko rendah kredibilitas atau yang hanya sekadar menerbitkan medali tanpa proses seleksi yang ketat.",
         ],
         bullets: [
           "Bintang 5★: Peringkat tertinggi dengan skor kurasi sangat kuat, tata kelola mapan, serta rekam jejak penyelenggaraan yang konsisten (contoh: Indonesia Inventors Day, NDO Goethe-Institut, ISFO OJK, Gita Bahana Nusantara, Kejurnas PERCASI, Kejuaraan PB ABTI).",
-          "Bintang 4★: Kredibilitas penyelenggara tinggi dengan cakupan peserta luas di tingkat nasional maupun internasional.",
-          "Bintang 3★: Sudah memenuhi standar kurasi yang diakui dan layak dijadikan portofolio prestasi resmi sesuai jenjang dan tingkatnya.",
+          "Bintang 4★: Kredibilitas penyelenggara tinggi dengan cakupan peserta luas di tingkat nasional maupun internasional serta juknis penjurian yang terstruktur.",
+          "Bintang 3★: Sudah memenuhi standar kurasi yang diakui dan layak dijadikan portofolio prestasi resmi sesuai jenjang dan tingkatnya, sekaligus ideal untuk membangun jam terbang sebelum naik ke ajang 4★–5★.",
         ],
       },
       {
         heading: "Tips Memanfaatkan Sertifikat Lomba untuk Jalur Prestasi",
         paragraphs: [
-          "Sertifikat dari lomba terkurasi memudahkan sekolah, perguruan tinggi, maupun panitia beasiswa memverifikasi keabsahan dan bobot ajang yang diikuti siswa. Pastikan nama penyelenggara, nama ajang, serta cabang lomba pada sertifikat Anda tercantum lengkap dan sesuai.",
+          "Sertifikat dari lomba terkurasi memudahkan sekolah, perguruan tinggi, maupun panitia beasiswa memverifikasi keabsahan dan bobot ajang yang diikuti siswa. Pastikan nama penyelenggara, nama ajang, tingkat kompetisi (Kabupaten/Kota, Provinsi, Nasional, atau Internasional), serta cabang lomba pada sertifikat Anda tercantum lengkap dan sesuai.",
+          "Selain menyimpan salinan digital sertifikat, arsipkan pula tautan pengumuman resmi pemenang, buku panduan (juknis), dan dokumentasi foto atau karya yang dilombakan agar sewaktu-waktu siap dilampirkan saat tahap verifikasi faktual.",
         ],
       },
     ],
@@ -435,6 +437,98 @@ export const GUIDES: GuideArticle[] = [
       {
         q: "Apakah data dari direktori ini bisa diekspor untuk keperluan rapat sekolah?",
         a: "Ya, di halaman Beranda tersedia tombol Export CSV yang mengunduh seluruh daftar lomba sesuai filter jenjang atau klaster yang sedang Anda pilih.",
+      },
+    ],
+  },
+  {
+    slug: "daftar-lomba-terkurasi-snbp-ppdb-jalur-prestasi",
+    title: "Panduan Memilih Lomba Terkurasi untuk Portofolio SNBP, SPMB, dan Jalur Prestasi Sekolah 2026–2027",
+    category: "Strategi Siswa",
+    readMinutes: 8,
+    publishedAt: "2026-11-18",
+    updatedAt: "2026-11-18",
+    excerpt:
+      "Cara menyusun strategi pemilihan lomba terkurasi bintang 3 hingga 5 yang paling relevan dengan jurusan tujuan SNBP maupun seleksi masuk sekolah jalur prestasi.",
+    relatedHubs: [
+      { label: "Lomba SMA/SMK/MA", href: "/kategori/sma-smk-ma/" },
+      { label: "Kurasi 4★ & 5★", href: "/kategori/bintang-4-dan-5/" },
+      { label: "Lomba SMP/MTs", href: "/kategori/smp-mts/" },
+    ],
+    sections: [
+      {
+        heading: "Mengapa Sertifikat Saja Tidak Cukup Tanpa Linearitas dan Kurasi?",
+        paragraphs: [
+          "Dalam seleksi jalur prestasi (baik SPMB/PPDB jenjang SMP–SMA maupun SNBP dan jalur mandiri perguruan tinggi), penilai tidak hanya menghitung jumlah sertifikat yang diunggah. Tiga faktor yang paling menentukan bobot portofolio adalah peringkat kurasi penyelenggara, tingkat cakupan kompetisi (Provinsi/Nasional/Internasional), serta relevansi bidang lomba dengan jurusan yang dituju.",
+          "Sebagai contoh, calon pendaftar program studi Kedokteran atau Farmasi akan memperoleh nilai relevansi lebih kuat dari medali olimpiade Biologi, Kimia, atau Karya Tulis Ilmiah kesehatan dari penyelenggara Bintang 4★–5★ dibanding sekadar puluhan sertifikat keikutsertaan dari lomba yang tidak linear.",
+        ],
+      },
+      {
+        heading: "Langkah Menyusun Portofolio Maksimal 3 Sertifikat Terbaik",
+        paragraphs: [
+          "Banyak portal seleksi jalur prestasi membatasi unggahan maksimal 3 sertifikat terbaik. Karena itu, strategi paling efektif bukan mengikuti lomba sebanyak mungkin secara acak, melainkan membidik 3 prestasi puncak yang terencana sejak dua tahun sebelum kelulusan.",
+        ],
+        bullets: [
+          "Tahun Pertama (Kelas 7/10): Fokus membangun dasar pada 1–2 cabang lomba Bintang 3★ atau penyisihan daring agar terbiasa dengan format soal dan manajemen waktu.",
+          "Tahun Kedua (Kelas 8/11): Naik kelas ke ajang Bintang 4★–5★ tingkat Nasional atau Internasional (seperti olimpiade fakultas UI/UGM/ITB/Undip, riset CYS/IYSA, atau Kejurnas induk cabor).",
+          "Semester Akhir Sebelum Seleksi: Pastikan seluruh sertifikat sudah mencantumkan nama lengkap sesuai ijazah/rapor, nomor piagam, tingkat kejuaraan, dan tanda tangan resmi panitia.",
+        ],
+      },
+      {
+        heading: "Cara Mengecek Lomba yang Paling Tepat di InfoLombaKurasi",
+        paragraphs: [
+          "Gunakan filter Jenjang Sasaran dan Urutkan berdasarkan Bintang Tertinggi (5★–3★) di halaman Beranda, lalu simpan 4–6 ajang prioritas menggunakan tombol Simpan agar batas pendaftarannya tidak terlewat.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Apakah prestasi beregu/tim tetap diakui di jalur prestasi?",
+        a: "Ya, kompetisi beregu seperti lomba karya tulis ilmiah, debat, riset inovasi, paduan suara, maupun cabang olahraga beregu tetap diakui selama sertifikat atau surat keterangan panitia mencantumkan nama setiap anggota tim dan status kejuaraan.",
+      },
+      {
+        q: "Mana yang lebih kuat: Juara 3 Nasional Bintang 4★ atau Juara 1 Provinsi Bintang 3★?",
+        a: "Umumnya peringkat Nasional dengan kurasi tinggi (Bintang 4★–5★) memberi sinyal daya saing lebih luas, tetapi bobot pastinya bergantung pada rubrik poin masing-masing dinas pendidikan atau perguruan tinggi tujuan.",
+      },
+    ],
+  },
+  {
+    slug: "strategi-mencari-lomba-gratis-dan-beasiswa-pelajar-terkurasi",
+    title: "Cara Menemukan Lomba Gratis & Subsidi Biaya Terkurasi Bintang 3–5 untuk Pelajar",
+    category: "Tips Teknis",
+    readMinutes: 6,
+    publishedAt: "2026-11-18",
+    updatedAt: "2026-11-18",
+    excerpt:
+      "Panduan menemukan kompetisi nasional terkurasi tanpa biaya pendaftaran (atau bersubsidi penuh) dari kementerian, OJK, BI, kampus negeri, dan yayasan resmi.",
+    relatedHubs: [
+      { label: "Pendaftaran Dibuka", href: "/kategori/pendaftaran-dibuka/" },
+      { label: "Klaster Riset & Inovasi", href: "/kategori/riset-dan-inovasi/" },
+      { label: "Lomba Nasional", href: "/kategori/nasional/" },
+    ],
+    sections: [
+      {
+        heading: "Siapa Saja Penyelenggara Lomba Terkurasi Tanpa Biaya?",
+        paragraphs: [
+          "Banyak pelajar mengira lomba bergengsi selalu membutuhkan biaya pendaftaran mahal. Faktanya, sebagian besar kompetisi Bintang 4★ dan 5★ justru diselenggarakan secara gratis atau bersubsidi penuh karena didanai anggaran lembaga negara, BUMN, atau kemitraan pendidikan.",
+        ],
+        bullets: [
+          "Kementerian & Lembaga Negara: Misalnya Otoritas Jasa Keuangan (ISFO), Bank Indonesia (OESN), Kemendikdasmen/Pusat Penguatan Karakter, BRIN (IRIFair), serta PPATK.",
+          "Lembaga Kebudayaan & Bahasa Internasional: Seperti Goethe-Institut Indonesien (Nationale Deutscholympiade) yang menanggung pembinaan hingga tingkat nasional/internasional.",
+          "Kompetisi Berjenjang Sekolah & Dinas Pendidikan: Banyak ajang daerah hingga nasional yang bebas biaya pendaftaran bagi delegasi resmi sekolah.",
+        ],
+      },
+      {
+        heading: "Membedakan Lomba Gratis Berkualitas vs Jebakan Biaya Tersembunyi",
+        paragraphs: [
+          "Pada sebagian lomba daring populer, pendaftaran tahap awal memang gratis, namun peserta baru diminta membayar biaya klaim medali, sertifikat cetak, atau ongkos kirim bila lolos kategori tertentu. Hal tersebut sah sepanjang dijelaskan transparan di juknis sejak awal.",
+          "Selalu baca bagian Ketentuan Biaya & Fasilitas di juknis resmi penyelenggara sebelum melakukan registrasi, dan manfaatkan daftar di portal ini untuk mengecek skor kurasi penyelenggaranya terlebih dahulu.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Apakah sekolah biasanya menanggung biaya lomba berbayar yang terkurasi?",
+        a: "Banyak sekolah memiliki pos dana BOS atau komite pembinaan prestasi untuk membiayai delegasi yang berlomba di ajang terkurasi bintang 3–5. Ajukan proposal singkat lengkap dengan halaman detail kurasi dan juknis resmi kepada guru pembina.",
       },
     ],
   },

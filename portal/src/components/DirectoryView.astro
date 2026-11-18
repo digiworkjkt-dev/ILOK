@@ -432,7 +432,7 @@ function pageHref(p: number): string {
               </div>
               <div class="lomba-actions">
                 <a class="btn btn-primary btn-sm" href="${href}">Detail &amp; ${x.branchesCnt} Cabang</a>
-                ${x.sourceUrl ? `<a class="btn btn-sm" href="${esc(x.sourceUrl)}" target="_blank" rel="noopener nofollow">Sumber Resmi ↗</a>` : ""}
+                ${x.sourceUrl ? `<a class="btn btn-sm" href="${esc(x.sourceUrl)}" target="_blank" rel="noopener nofollow" data-track-event="click_official_source" data-track-slug="${esc(x.slug)}">Sumber Resmi ↗</a>` : ""}
                 <button type="button" class="btn btn-sm btn-save" data-save-slug="${x.slug}" onclick="toggleSaveLomba('${x.slug}')">Simpan</button>
               </div>
             </div>
@@ -570,12 +570,26 @@ function pageHref(p: number): string {
       }
     }
 
+    let searchTrackTimer;
     ["fSearch", "fStatus", "fTimeWindow", "fRating", "fCluster", "fLevel", "fJenjang", "fMode", "fCountry", "fSort"].forEach((id) => {
       const el = $(id);
       if (!el) return;
       el.addEventListener(id === "fSearch" ? "input" : "change", () => {
         syncChips();
         applyFilter();
+        if (window.lkTrack) {
+          if (id === "fSearch") {
+            clearTimeout(searchTrackTimer);
+            const term = el.value.trim();
+            if (term.length >= 2) {
+              searchTrackTimer = setTimeout(() => {
+                window.lkTrack("directory_filter_used", { filter_id: id, value: term.slice(0, 80) });
+              }, 800);
+            }
+          } else {
+            window.lkTrack("directory_filter_used", { filter_id: id, value: el.value });
+          }
+        }
       });
     });
 
@@ -593,6 +607,7 @@ function pageHref(p: number): string {
         document.querySelectorAll(".chip-btn[data-chip]").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         applyFilter();
+        if (window.lkTrack) window.lkTrack("directory_filter_used", { filter_id: "quick_chip", value: c });
       });
     });
 
@@ -623,6 +638,17 @@ function pageHref(p: number): string {
       a.href = URL.createObjectURL(blob);
       a.download = "lomba_terkurasi_terfilter.csv";
       a.click();
+      if (window.lkTrack) window.lkTrack("export_csv", { row_count: currentFiltered.length });
     });
+
+    // Support URL search query (?q=...) for WebSite SearchAction & deep-linked searches
+    try {
+      const initialQ = new URLSearchParams(window.location.search).get("q");
+      if (initialQ && $("fSearch")) {
+        $("fSearch").value = initialQ;
+        syncChips();
+        applyFilter();
+      }
+    } catch {}
   })();
 </script>

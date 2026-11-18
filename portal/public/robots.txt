@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /tersimpan/
 
-Sitemap: https://lombakurasi.id/sitemap-index.xml
+Sitemap: https://lombakurasi.info/sitemap-index.xml

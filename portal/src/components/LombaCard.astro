@@ -63,7 +63,14 @@ const detailHref = `/penyelenggara/${item.slug}/`;
       <a class="btn btn-primary btn-sm" href={detailHref}>Detail &amp; {item.branchesCnt} Cabang</a>
       {
         item.sourceUrl && (
-          <a class="btn btn-sm" href={item.sourceUrl} target="_blank" rel="noopener nofollow">
+          <a
+            class="btn btn-sm"
+            href={item.sourceUrl}
+            target="_blank"
+            rel="noopener nofollow"
+            data-track-event="click_official_source"
+            data-track-slug={item.slug}
+          >
             Sumber Resmi ↗
           </a>
         )

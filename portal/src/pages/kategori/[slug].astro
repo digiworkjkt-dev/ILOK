@@ -22,7 +22,8 @@ const { hub, matched } = Astro.props as { hub: HubDefinition; matched: Organizer
 const pageItems = matched.slice(0, SITE.perPage);
 const totalPages = Math.max(1, Math.ceil(matched.length / SITE.perPage));
 const canonicalPath = `/kategori/${hub.slug}/`;
-const siteBase = Astro.site || "https://lombakurasi.id";
+const siteBase = Astro.site || SITE.url;
+const nextPath = totalPages > 1 ? `${canonicalPath}halaman/2/` : undefined;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -39,6 +40,7 @@ const jsonLd = {
   title={`${hub.title} — ${SITE.name}`}
   description={hub.metaDescription}
   canonicalPath={canonicalPath}
+  nextPath={nextPath}
   jsonLd={jsonLd}
 >
   <nav class="breadcrumb" aria-label="Breadcrumb">

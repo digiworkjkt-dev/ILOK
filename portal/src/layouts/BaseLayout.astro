@@ -2,7 +2,6 @@
 import { SITE } from "../config/site";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import AdSlot from "../components/AdSlot.astro";
 import "../styles/global.css";
 
 export interface Props {
@@ -10,6 +9,10 @@ export interface Props {
   description?: string;
   canonicalPath?: string;
   noindex?: boolean;
+  prevPath?: string;
+  nextPath?: string;
+  ogType?: string;
+  ogImage?: string;
   jsonLd?: Record<string, any> | Record<string, any>[];
 }
 
@@ -18,12 +21,24 @@ const {
   description = SITE.description,
   canonicalPath = Astro.url.pathname,
   noindex = false,
+  prevPath,
+  nextPath,
+  ogType = "website",
+  ogImage = SITE.seo.defaultOgImage,
   jsonLd,
 } = Astro.props;
 
-const canonicalUrl = new URL(canonicalPath, Astro.site || "https://lombakurasi.id").toString();
+const siteBase = Astro.site || SITE.url;
+const canonicalUrl = new URL(canonicalPath, siteBase).toString();
+const prevUrl = prevPath ? new URL(prevPath, siteBase).toString() : undefined;
+const nextUrl = nextPath ? new URL(nextPath, siteBase).toString() : undefined;
+const ogImageUrl = new URL(ogImage, siteBase).toString();
 const ldList = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 const hasLiveMobileAd = Boolean(SITE.ads.adsenseClient && SITE.ads.slots.mobileAnchor);
+const showMobileAnchor = hasLiveMobileAd || SITE.ads.showPlaceholders;
+const fontsHref =
+  "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap";
+const { gaMeasurementId, clarityId, enableVercelAnalytics, enableVercelSpeedInsights } = SITE.analytics;
 ---
 
 <!DOCTYPE html>
@@ -34,21 +49,39 @@ const hasLiveMobileAd = Boolean(SITE.ads.adsenseClient && SITE.ads.slots.mobileA
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    {prevUrl && <link rel="prev" href={prevUrl} />}
+    {nextUrl && <link rel="next" href={nextUrl} />}
     {noindex && <meta name="robots" content="noindex,follow" />}
+
+    {SITE.seo.googleSiteVerification && <meta name="google-site-verification" content={SITE.seo.googleSiteVerification} />}
+    {SITE.seo.bingSiteVerification && <meta name="msvalidate.01" content={SITE.seo.bingSiteVerification} />}
+    {SITE.ads.adsenseClient && <meta name="google-adsense-account" content={SITE.ads.adsenseClient} />}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#104186" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preload" as="style" href={fontsHref} />
+    <link rel="stylesheet" href={fontsHref} media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href={fontsHref} /></noscript>
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content="id_ID" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
 
     {
       SITE.ads.adsenseClient && (
@@ -61,12 +94,51 @@ const hasLiveMobileAd = Boolean(SITE.ads.adsenseClient && SITE.ads.slots.mobileA
     }
 
     {
+      gaMeasurementId && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`} />
+          <script
+            is:inline
+            set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config',${JSON.stringify(gaMeasurementId)},{anonymize_ip:true});`}
+          />
+        </>
+      )
+    }
+
+    {
+      clarityId && (
+        <script
+          is:inline
+          set:html={`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",${JSON.stringify(clarityId)});`}
+        />
+      )
+    }
+
+    {
+      enableVercelAnalytics && (
+        <>
+          <script is:inline>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+          <script defer src="/_vercel/insights/script.js"></script>
+        </>
+      )
+    }
+
+    {
+      enableVercelSpeedInsights && (
+        <>
+          <script is:inline>window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };</script>
+          <script defer src="/_vercel/speed-insights/script.js"></script>
+        </>
+      )
+    }
+
+    {
       ldList.map((schema) => (
         <script type="application/ld+json" set:html={JSON.stringify(schema)} />
       ))
     }
   </head>
-  <body>
+  <body class={showMobileAnchor ? "has-mobile-ad" : ""}>
     <Header activePath={canonicalPath} />
     <main class="container">
       <slot />
@@ -74,7 +146,7 @@ const hasLiveMobileAd = Boolean(SITE.ads.adsenseClient && SITE.ads.slots.mobileA
     <Footer />
 
     {
-      (hasLiveMobileAd || SITE.ads.showPlaceholders) && (
+      showMobileAnchor && (
         <div class="mobile-anchor-ad" id="mobileAnchorBar">
           <button
             class="mobile-anchor-close"
@@ -104,6 +176,19 @@ const hasLiveMobileAd = Boolean(SITE.ads.adsenseClient && SITE.ads.slots.mobileA
     <script is:inline>
       (function () {
         const KEY = "lombakurasi_saved_slugs";
+        window.lkTrack = function (eventName, params) {
+          try {
+            if (typeof window.gtag === "function") {
+              window.gtag("event", eventName, params || {});
+            }
+            if (typeof window.va === "function") {
+              window.va("event", { name: eventName, data: params || {} });
+            }
+            if (typeof window.clarity === "function") {
+              window.clarity("event", eventName);
+            }
+          } catch {}
+        };
         function getSaved() {
           try {
             return JSON.parse(localStorage.getItem(KEY) || "[]");
@@ -133,11 +218,21 @@ const hasLiveMobileAd = Boolean(SITE.ads.adsenseClient && SITE.ads.slots.mobileA
         window.toggleSaveLomba = function (slug) {
           const list = getSaved();
           const idx = list.indexOf(slug);
+          const action = idx >= 0 ? "unsave" : "save";
           if (idx >= 0) list.splice(idx, 1);
           else list.push(slug);
           setSaved(list);
+          window.lkTrack("save_competition", { action, slug });
           window.dispatchEvent(new CustomEvent("lombakurasi:saved-changed"));
         };
+        document.addEventListener("click", (e) => {
+          const el = e.target && e.target.closest ? e.target.closest("[data-track-event]") : null;
+          if (!el) return;
+          const ev = el.getAttribute("data-track-event");
+          const slug = el.getAttribute("data-track-slug") || "";
+          const label = (el.textContent || "").trim().slice(0, 120);
+          window.lkTrack(ev, { slug, label });
+        });
         window.getSavedLombaSlugs = getSaved;
         window.syncSaveButtons = syncUI;
         document.addEventListener("DOMContentLoaded", syncUI);

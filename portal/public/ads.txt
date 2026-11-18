@@ -1,2 +1,2 @@
-# Ganti pub-0000000000000000 dengan Publisher ID Google AdSense Anda setelah akun disetujui
+# Untuk lombakurasi.info: ganti pub-0000000000000000 dengan Publisher ID Google AdSense Anda setelah akun disetujui lalu hapus tanda #
 # google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

@@ -5,7 +5,7 @@ import { SITE } from "../config/site";
 
 <BaseLayout
   title={`Tentang Kami & Metodologi Kurasi — ${SITE.name}`}
-  description="Mengenal metodologi kurasi lomba bintang 3 ke atas dan penelusuran jadwal kompetisi terdekat di InfoLombaKurasi."
+  description="Mengenal metodologi kurasi lomba bintang 3 ke atas, standar editorial independen, dan penelusuran jadwal kompetisi terdekat di InfoLombaKurasi."
   canonicalPath="/tentang/"
 >
   <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -13,21 +13,32 @@ import { SITE } from "../config/site";
   </nav>
 
   <article class="panel">
-    <h1>Tentang {SITE.name}</h1>
+    <h1>Tentang {SITE.name} ({SITE.domain})</h1>
     <p>
       <strong>{SITE.name}</strong> adalah direktori informasi independen yang membantu pelajar (SD, SMP, SMA/SMK/MA), mahasiswa, guru pembina, dan orang tua menemukan jadwal pelaksanaan lomba terdekat dari penyelenggara terkurasi berperingkat <strong>Bintang 3★ hingga 5★</strong>.
     </p>
-    <h2>Metodologi Penyusunan Data</h2>
+
+    <h2>Metodologi Penyusunan &amp; Verifikasi Data</h2>
     <ol>
       <li>
         <strong>Penyaringan Standar Kurasi (≥ 3★):</strong> Data kurasi diseleksi berdasarkan kelayakan penyelenggara, rekam jejak ajang, dan peringkat kualitas bintang 3, 4, dan 5 yang mencakup 292 penyelenggara unik, 682 judul ajang, dan 1.284 cabang kompetisi.
       </li>
       <li>
-        <strong>Penelusuran Jadwal Terdekat (*Deep Search*):</strong> Tim kami melakukan penelusuran langsung ke situs resmi masing-masing penyelenggara untuk memetakan agenda pelaksanaan terdekat berdasarkan acuan waktu <strong>{SITE.referenceDateLabel}</strong>.
+        <strong>Penelusuran Jadwal Terdekat (*Deep Search*):</strong> Tim kami melakukan penelusuran langsung ke situs resmi masing-masing penyelenggara untuk memetakan agenda pelaksanaan terdekat serta batas pendaftaran berdasarkan acuan waktu <strong>{SITE.referenceDateLabel}</strong> (pembaruan portal terakhir: <strong>{SITE.lastUpdatedLabel}</strong>).
       </li>
       <li>
         <strong>Pemisahan Status Transparan:</strong> Setiap jadwal diberi label jelas antara <em>Pendaftaran Dibuka</em>, <em>Sedang Berlangsung</em>, <em>Akan Datang (Terjadwal)</em>, <em>Estimasi Siklus Tahunan</em>, atau <em>Belum Ada Info Terbaru</em> agar pengguna tidak keliru antara tanggal resmi dan proyeksi tahunan.
       </li>
+      <li>
+        <strong>Penyaringan Batas Daftar Berjalan Otomatis:</strong> Daftar sorotan <em>Batas Pendaftaran Terdekat</em> secara otomatis menyembunyikan agenda yang tanggal tutupnya telah lewat dari hari berjalan dan menandai batas waktu 3 hari terakhir.
+      </li>
     </ol>
+
+    <h2>Kebijakan Editorial &amp; Independensi</h2>
+    <ul>
+      <li>Setiap entri wajib menyertakan tautan rujukan ke situs atau pengumuman resmi penyelenggara agar peserta dapat memverifikasi juknis secara langsung.</li>
+      <li>Peringkat kurasi bersifat objektif sesuai data historis dan tidak dapat dibeli atau diubah melalui kerja sama promosi.</li>
+      <li>Koreksi jadwal atau pembaruan tautan dapat dikirimkan kapan saja melalui halaman <a href="/kontak/">Kontak &amp; Koreksi Jadwal</a>.</li>
+    </ul>
   </article>
 </BaseLayout>

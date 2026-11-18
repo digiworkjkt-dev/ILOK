@@ -115,6 +115,7 @@ const allItems = (rawLomba as OrganizerItem[]).map((x) => ({
         a.href = URL.createObjectURL(blob);
         a.download = "lomba_tersimpan_saya.csv";
         a.click();
+        if (window.lkTrack) window.lkTrack("export_csv", { page_type: "saved", row_count: items.length });
       });
 
       window.addEventListener("lombakurasi:saved-changed", render);

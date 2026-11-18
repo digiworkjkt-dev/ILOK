@@ -40,12 +40,17 @@ const { hub, matched, pageItems, currentPage, totalPages } = Astro.props as {
 
 const basePath = `/kategori/${hub.slug}/`;
 const canonicalPath = `${basePath}halaman/${currentPage}/`;
+const prevPath = currentPage <= 2 ? basePath : `${basePath}halaman/${currentPage - 1}/`;
+const nextPath = currentPage < totalPages ? `${basePath}halaman/${currentPage + 1}/` : undefined;
 ---
 
 <BaseLayout
   title={`${hub.title} (Halaman ${currentPage}) — ${SITE.name}`}
   description={hub.metaDescription}
   canonicalPath={canonicalPath}
+  noindex={true}
+  prevPath={prevPath}
+  nextPath={nextPath}
 >
   <nav class="breadcrumb" aria-label="Breadcrumb">
     <a href="/">Beranda</a> / <a href="/kategori/">Kategori</a> / <a href={basePath}>{hub.shortTitle}</a> / <span>Halaman {currentPage}</span>

@@ -49,19 +49,38 @@ const imminentEvents = allItems
   .filter((x) => ["Sedang Berlangsung", "Pendaftaran Dibuka", "Akan Datang (Terjadwal)"].includes(x.status) && x.effectiveSort !== "9999-12-31")
   .slice(0, 5);
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: SITE.name,
-  description: SITE.description,
-  url: new URL("/", Astro.site || "https://lombakurasi.id").toString(),
-};
+const siteBase = Astro.site || SITE.url;
+const homeUrl = new URL("/", siteBase).toString();
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE.name,
+    alternateName: SITE.domain,
+    description: SITE.description,
+    url: homeUrl,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${homeUrl}?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE.name,
+    url: homeUrl,
+    logo: new URL("/apple-touch-icon.png", siteBase).toString(),
+    email: SITE.contactEmail,
+  },
+];
 ---
 
 <BaseLayout
   title={`${SITE.name} — Kalender Lomba Terkurasi Bintang 3–5 Terdekat`}
   description={SITE.description}
   canonicalPath="/"
+  nextPath={totalPages > 1 ? "/halaman/2/" : undefined}
   jsonLd={jsonLd}
 >
   <section class="hero">
@@ -125,7 +144,12 @@ const jsonLd = {
                   Tutup {fmtDate(d.regDeadline)}
                 </span>
                 <div>
-                  <a href={`/penyelenggara/${d.slug}/`} style="font-weight:600;color:var(--text);">
+                  <a
+                    href={`/penyelenggara/${d.slug}/`}
+                    data-track-event="click_urgent_deadline"
+                    data-track-slug={d.slug}
+                    style="font-weight:600;color:var(--text);"
+                  >
                     {d.event !== "-" ? d.event : d.org}
                   </a>
                   <div style="font-size:12px;color:var(--text-soft);">
@@ -244,6 +268,8 @@ const jsonLd = {
       const info = document.createElement("div");
       const link = document.createElement("a");
       link.href = `/penyelenggara/${encodeURIComponent(d.slug)}/`;
+      link.setAttribute("data-track-event", "click_urgent_deadline");
+      link.setAttribute("data-track-slug", d.slug);
       link.style.cssText = "font-weight:600;color:var(--text);";
       link.textContent = d.event !== "-" ? d.event : d.org;
 

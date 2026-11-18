@@ -15,11 +15,94 @@ import { SITE } from "../config/site";
   <article class="panel">
     <h1>Kontak &amp; Pembaruan Jadwal Lomba</h1>
     <p>
-      Apabila Anda merupakan penyelenggara lomba terkurasi, guru pembina, atau peserta yang menemukan pembaruan tanggal pendaftaran, perubahan tautan resmi, atau koreksi informasi, silakan kirimkan detailnya kepada kami.
+      Apabila Anda merupakan penyelenggara lomba terkurasi, guru pembina, atau peserta yang menemukan pembaruan tanggal pendaftaran, perubahan tautan resmi, atau koreksi informasi di <strong>{SITE.domain}</strong>, silakan kirimkan detailnya kepada tim redaksi kami.
     </p>
     <ul>
       <li><strong>Email Redaksi:</strong> <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a></li>
+      <li><strong>Estimasi Tindak Lanjut:</strong> Verifikasi dan pembaruan jadwal diproses dalam <strong>1–2 hari kerja</strong> setelah sumber resmi terkonfirmasi.</li>
       <li><strong>Format Koreksi Cepat:</strong> Sertakan <em>Nama Penyelenggara</em>, <em>Nama Ajang Terbaru</em>, <em>Tanggal Pelaksanaan &amp; Batas Pendaftaran</em>, serta <em>Tautan Halaman Resmi</em>.</li>
     </ul>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;" />
+
+    <h2 style="font-size:17px;margin-bottom:6px;">Formulir Cepat Koreksi / Pengajuan Jadwal</h2>
+    <p style="margin:0;color:var(--text-muted);font-size:13.5px;">
+      Isi formulir berikut untuk menyusun format laporan terstruktur ke email redaksi atau menyalin draf laporannya.
+    </p>
+
+    <form class="contact-form" id="correctionForm">
+      <div class="contact-field">
+        <label for="cType">Jenis Laporan</label>
+        <select id="cType" required>
+          <option value="Koreksi Jadwal / Batas Pendaftaran">Koreksi Jadwal / Batas Pendaftaran</option>
+          <option value="Pembaruan Tautan Resmi Penyelenggara">Pembaruan Tautan Resmi Penyelenggara</option>
+          <option value="Pengajuan Info Ajang Terkurasi Baru">Pengajuan Info Ajang Terkurasi Baru</option>
+          <option value="Masukan Teknis / Kerja Sama">Masukan Teknis / Kerja Sama</option>
+        </select>
+      </div>
+      <div class="contact-field">
+        <label for="cOrg">Nama Penyelenggara / Lomba</label>
+        <input id="cOrg" type="text" required placeholder="Contoh: IYSA — AISEEF 2027" />
+      </div>
+      <div class="contact-field">
+        <label for="cDates">Tanggal Pelaksanaan &amp; Batas Daftar Terbaru</label>
+        <input id="cDates" type="text" placeholder="Contoh: Daftar s.d. 15 Jan 2027, Pelaksanaan 10–13 Feb 2027" />
+      </div>
+      <div class="contact-field">
+        <label for="cUrl">Tautan Sumber Resmi (Website / Juknis / Instagram Resmi)</label>
+        <input id="cUrl" type="url" required placeholder="https://..." />
+      </div>
+      <div class="contact-field">
+        <label for="cNote">Catatan Tambahan</label>
+        <textarea id="cNote" rows="3" placeholder="Jelaskan bagian yang perlu diperbarui atau ditambahkan..."></textarea>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button type="submit" class="btn btn-primary">Kirim via Email Redaksi</button>
+        <button type="button" class="btn" id="btnCopyReport">Salin Format Laporan</button>
+        <span id="contactStatus" class="mono" style="font-size:12px;color:var(--green-fg);"></span>
+      </div>
+    </form>
   </article>
+
+  <script is:inline define:vars={{ contactEmail: SITE.contactEmail }}>
+    (function () {
+      const form = document.getElementById("correctionForm");
+      const copyBtn = document.getElementById("btnCopyReport");
+      const statusEl = document.getElementById("contactStatus");
+
+      function buildPayload() {
+        const type = document.getElementById("cType")?.value || "";
+        const org = document.getElementById("cOrg")?.value.trim() || "";
+        const dates = document.getElementById("cDates")?.value.trim() || "-";
+        const url = document.getElementById("cUrl")?.value.trim() || "-";
+        const note = document.getElementById("cNote")?.value.trim() || "-";
+        const subject = `[${type}] ${org || "Pembaruan Jadwal Lomba"}`;
+        const body = [
+          `Jenis Laporan: ${type}`,
+          `Penyelenggara / Lomba: ${org}`,
+          `Jadwal & Batas Daftar: ${dates}`,
+          `Tautan Sumber Resmi: ${url}`,
+          `Catatan Tambahan: ${note}`,
+        ].join("\n");
+        return { subject, body };
+      }
+
+      form?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const { subject, body } = buildPayload();
+        if (window.lkTrack) window.lkTrack("submit_correction_mailto");
+        window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      });
+
+      copyBtn?.addEventListener("click", async () => {
+        const { subject, body } = buildPayload();
+        try {
+          await navigator.clipboard.writeText(`Tujuan: ${contactEmail}\nSubjek: ${subject}\n\n${body}`);
+          if (statusEl) statusEl.textContent = "Format laporan tersalin ke clipboard.";
+        } catch {
+          if (statusEl) statusEl.textContent = "Gagal menyalin otomatis, silakan kirim via tombol email.";
+        }
+      });
+    })();
+  </script>
 </BaseLayout>

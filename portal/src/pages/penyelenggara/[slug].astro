@@ -57,7 +57,8 @@ const titleText =
 const descText = `Jadwal terbaru ${item.event !== "-" ? item.event : item.org} oleh ${item.org} (Peringkat Kurasi Bintang ${item.rating}★). Status: ${item.status}, pelaksanaan: ${fmtDate(item.start, true)}, jenjang: ${item.jenjang}.`;
 
 const canonicalPath = `/penyelenggara/${item.slug}/`;
-const siteBase = Astro.site || "https://lombakurasi.id";
+const siteBase = Astro.site || SITE.url;
+const pageUrl = new URL(canonicalPath, siteBase).toString();
 
 const jsonLdList: Record<string, any>[] = [
   {
@@ -88,6 +89,8 @@ if (
     "@context": "https://schema.org",
     "@type": "Event",
     name: item.event,
+    url: pageUrl,
+    image: new URL(SITE.seo.defaultOgImage, siteBase).toString(),
     startDate: startIso,
     endDate: endIso,
     eventAttendanceMode:
@@ -187,20 +190,42 @@ if (
           )
         }
 
+        {
+          item.status === "Belum Ada Info Terbaru" && (
+            <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--text-muted);">
+              <strong>Status Pembaruan Jadwal:</strong> Penyelenggara ini belum merilis pengumuman resmi untuk edisi terbaru. Anda dapat memantau kanal resminya di bawah, menyimpan halaman ini untuk pantauan berkala, atau meninjau daftar lomba aktif sejenis di bagian bawah halaman.
+            </div>
+          )
+        }
+
         <h2 style="font-size:16px;margin-bottom:6px;">Ringkasan Jadwal &amp; Informasi Penyelenggaraan</h2>
         <p style="margin:0 0 16px;color:var(--text-muted);">{item.notes}</p>
 
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           {
             item.sourceUrl && (
-              <a class="btn btn-primary" href={item.sourceUrl} target="_blank" rel="noopener nofollow">
+              <a
+                class="btn btn-primary"
+                href={item.sourceUrl}
+                target="_blank"
+                rel="noopener nofollow"
+                data-track-event="click_official_source"
+                data-track-slug={item.slug}
+              >
                 Sumber Jadwal Resmi ↗
               </a>
             )
           }
           {
             item.orgLink && item.orgLink !== item.sourceUrl && (
-              <a class="btn" href={item.orgLink} target="_blank" rel="noopener nofollow">
+              <a
+                class="btn"
+                href={item.orgLink}
+                target="_blank"
+                rel="noopener nofollow"
+                data-track-event="click_official_source"
+                data-track-slug={item.slug}
+              >
                 Website Penyelenggara ↗
               </a>
             )
